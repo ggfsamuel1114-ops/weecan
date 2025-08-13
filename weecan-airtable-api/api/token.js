@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // CORS headers
+  // CORS 设置
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -8,34 +8,40 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  if (req.method === "POST") {
-    try {
-      const { name, email } = req.body;
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
-      const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
-      const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-      const AIRTABLE_TABLE_NAME = process.env.AIRTABLE_TABLE_NAME;
+  try {
+    // 从请求体获取数据
+    const { field1, field2 } = req.body;
 
-      const airtableRes = await fetch(
-        `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${AIRTABLE_API_KEY}`,
-            "Content-Type": "application/json",
+    // Airtable API
+    const airtableApiKey = "你的 Airtable API Key";
+    const baseId = "你的 Base ID";
+    const tableName = "Buy from Farmer";
+
+    const response = await fetch(
+      `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${airtableApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fields: {
+            Field1: field1,
+            Field2: field2,
           },
-          body: JSON.stringify({
-            fields: { Name: name, Email: email },
-          }),
-        }
-      );
+        }),
+      }
+    );
 
-      const data = await airtableRes.json();
-      res.status(200).json(data);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  } else {
-    res.status(405).json({ error: "Method not allowed" });
+    const data = await response.json();
+    return res.status(200).json(data);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Something went wrong" });
   }
 }
