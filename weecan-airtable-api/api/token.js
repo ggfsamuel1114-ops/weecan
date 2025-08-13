@@ -1,12 +1,12 @@
 // api/submit.js
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+export default function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*"); // 允许所有域访问
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  const token = process.env.AIRTABLE_TOKEN; // 从 Vercel 环境变量读取
-  const baseId = process.env.AIRTABLE_BASE_ID; // 从 Vercel 环境变量读取
-  const tableName = 'Purchases'; // 固定表名
+  if (req.method === "OPTIONS") {
+    return res.status(200).end(); // 预检请求直接返回
+  }
 
   try {
     const airtableRes = await fetch(`https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}`, {
