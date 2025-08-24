@@ -15,9 +15,13 @@ export default async function handler(req, res) {
   try {
     const { user, pass } = req.body;
 
-    // 从 Vercel 环境变量里读取用户名和密码
+    // 从 Vercel 环境变量里读取
     const ADMIN_USER = process.env.ADMIN_USER;
     const ADMIN_PASS = process.env.ADMIN_PASS;
+
+    // 🔍 Debug log
+    console.log("🟢 Debug 前端传来的:", { user, pass });
+    console.log("🟢 Debug ENV:", { ADMIN_USER, ADMIN_PASS });
 
     if (user === ADMIN_USER && pass === ADMIN_PASS) {
       return res.status(200).json({ success: true });
@@ -25,6 +29,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
   } catch (err) {
+    console.error("❌ Server error", err);
     res.status(500).json({ success: false, error: "Server error", details: err.message });
   }
 }
