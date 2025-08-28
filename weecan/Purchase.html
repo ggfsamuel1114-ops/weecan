@@ -1,0 +1,394 @@
+
+
+
+<!DOCTYPE html>
+<html lang="zh-MY">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weecan Invoice</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #fdf8f3;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+    @media (min-width: 700px) {
+      body { flex-direction: row; }
+    }
+    .input-area, .preview-area {
+      flex: 1;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 10px;
+      background: #fff8f0;
+      box-shadow: 0 0 10px rgba(200,150,100,0.1);
+    }
+    h3, h4 { color: #5e4638; }
+    .button-group button, button {
+      padding: 12px 18px;
+      margin: 5px;
+      font-size: 16px;
+      background: #d2e5f3;
+      color: #333;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .button-group button:hover, button:hover {
+      background: #bdd9eb;
+    }
+    .product-button.active {
+      background: #a5e6be !important;
+      border: 2px solid #49a97f;
+    }
+    input {
+      padding: 12px;
+      font-size: 16px;
+      width: 70%;   
+      margin: 5px 0;
+      border: 1px solid #aaccee;
+      border-radius: 10px;
+      background: #ffffff;
+    }
+    .invoice-box input[type="number"] {
+      width: 80px;
+      padding: 6px 8px;
+      font-size: 15px;
+      border: 1px solid #aaccee;
+      border-radius: 8px;
+      text-align: right;
+      background: #f9fcff;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .invoice-box td { vertical-align: middle; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th { background: #f3e4d7; color: #5e4638; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+    #weight, #price {
+      width: 120px;
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    /* Toast 样式 */
+    #toast {
+      visibility: hidden;
+      min-width: 200px;
+      background: #4caf50;
+      color: #fff;
+      text-align: center;
+      border-radius: 8px;
+      padding: 12px;
+      position: fixed;
+      z-index: 1000;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%);
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="input-area">
+    <h3>🧾 Name</h3>
+    <input type="text" id="customerName" placeholder="客户名字 (必填)" />
+
+    <h3>果类</h3>
+    <h4>✍️ 其他品种</h4>
+    <input type="text" id="customProductInput" placeholder="输入自定义产品名称" />
+
+    <h4>🍈 Musang</h4>
+    <div class="button-group">
+      <button class="product-button" data-name="Musang AM">Musang AM</button>
+      <button class="product-button" data-name="Musang ABM">Musang ABM</button>
+      <button class="product-button" data-name="Musang BM">Musang BM</button>
+      <button class="product-button" data-name="Musang CM">Musang CM</button>
+      <button class="product-button" data-name="Musang CCM">Musang CCM</button>
+      <button class="product-button" data-name="Musang CCCM">Musang CCCM</button>
+    </div>
+
+    <h4>🌑 Black Thorn</h4>
+    <div class="button-group">
+      <button class="product-button" data-name="BTA">BTA</button>
+      <button class="product-button" data-name="BTB">BTB</button>
+      <button class="product-button" data-name="BTC">BTC</button>
+      <button class="product-button" data-name="BTCC">BTCC</button>
+    </div>
+
+    <h4>🌕 D24</h4>
+    <div class="button-group">
+      <button class="product-button" data-name="D24A">D24A</button>
+      <button class="product-button" data-name="D24B">D24B</button>
+      <button class="product-button" data-name="D24C">D24C</button>
+    </div>
+
+    <h4>🍃 其他品种</h4>
+    <div class="button-group">
+      <button class="product-button" data-name="Kampung">Kampung</button>
+      <button class="product-button" data-name="KC">KC</button>
+      <button class="product-button" data-name="Kahwin">KW</button>
+    </div>
+    
+    <div id="selected-product-display" style="margin-top:12px;padding:10px;background:#f3f3f3;border-radius:10px;">
+      🧺 当前选择： 
+      <span id="selectedProductText" style="font-weight:bold;background:#ffd966;color:#4b3b00;padding:4px 8px;border-radius:6px;">未选择</span>
+    </div>
+    
+    <div>
+      
+    </div>
+    <input type="hidden" id="productName">
+    
+    <!-- 并排的重量 + 单价 -->
+    <div style="display:flex; gap:20px; align-items:flex-end; margin-top:10px;">
+      <div>
+        <h4>重量（kg）</h4>
+        <input type="number" id="weight" placeholder="重量" />
+      </div>
+      <div>
+        <h4>单价（RM）</h4>
+        <input type="number" id="price" placeholder="单价" />
+      </div>
+    </div>
+    
+    <div style="margin-top:15px; display:flex; justify-content:flex-end; gap:15px;">
+      <button type="button" id="backBtn">Back</button>
+      <button type="button" id="addItemBtn">➕ 添加商品</button>
+    </div>
+
+  </div>
+
+  <div class="preview-area">
+    <h3>📋 Invoice Overview</h3>
+    <div class="invoice-box">
+      <table>
+        <thead>
+          <tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th><th>操作</th></tr>
+        </thead>
+        <tbody id="invoiceItems"></tbody>
+      </table>
+      <p><strong>总计：</strong>RM <span id="totalAmount">0.00</span></p>
+    </div>
+    <div style="margin-top:15px;text-align:right;">
+      <button type="button" id="submitButton" style="display:none;">📤 提交到 Airtable</button>
+    </div>
+  </div>
+
+  <!-- Toast 容器 -->
+  <div id="toast"></div>
+
+  <script>
+  const API_URL = "https://weecan-airtable-api.vercel.app/api/token";
+  const items = [];
+  window.receiptNo = generateReceiptNo();
+
+  function generateReceiptNo() {
+    const now = new Date();
+    const ymd = now.toISOString().slice(2,10).replace(/-/g,"");
+    const rand = Math.floor(1000 + Math.random()*9000);
+    return `RCPT-${ymd}-${rand}`;
+  }
+
+  function selectProduct(name, btn) {
+    document.getElementById('customProductInput').value = '';
+    document.getElementById('productName').value = name;
+    document.getElementById('selectedProductText').innerText = name;
+    document.querySelectorAll('.product-button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.style.visibility = "visible";
+    setTimeout(() => {
+      toast.style.visibility = "hidden";
+    }, 2000);
+  }
+
+  function addItem() {
+    const prod = document.getElementById('productName').value.trim();
+    const w = parseFloat(document.getElementById('weight').value);
+    const p = parseFloat(document.getElementById('price').value);
+    if(prod && !isNaN(w) && !isNaN(p)) {
+      items.push({product:prod,weight:w,price:p}); updateInvoice();
+      document.getElementById('productName').value='';
+      document.getElementById('selectedProductText').innerText='未选择';
+      document.getElementById('weight').value='';
+      document.getElementById('price').value='';
+      document.querySelectorAll('.product-button').forEach(b=>b.classList.remove('active'));
+      showToast("✅ 添加成功");
+    } else {
+      alert('请填写完整！');
+    }
+  }
+
+  function updateInvoice() {
+    const tbody = document.getElementById('invoiceItems'); tbody.innerHTML='';
+    let total=0;
+    items.forEach((it,i)=>{
+      const sub=it.weight*it.price; total+=sub;
+      tbody.insertAdjacentHTML('beforeend',
+        `<tr><td>${it.product}</td><td><input type="number" value="${it.weight}" onchange="editItem(${i},'weight',this.value)"></td>` +
+        `<td><input type="number" value="${it.price.toFixed(2)}" onchange="editItem(${i},'price',this.value)"></td>`+
+        `<td>${sub.toFixed(2)}</td><td><button type="button" onclick="deleteItem(${i})">❌ 删除</button></td></tr>`);
+    });
+    document.getElementById('totalAmount').innerText = total.toFixed(2);
+    document.getElementById('submitButton').style.display = items.length ? 'inline-block':'none';
+  }
+
+  function deleteItem(i){ if(confirm('确定要删除这一项吗？')){ items.splice(i,1); updateInvoice(); }}
+  function editItem(i,f,v){ const n=parseFloat(v); if(!isNaN(n)){ items[i][f]=n; updateInvoice(); }}
+
+  function printReceipt() {
+    const cust = document.getElementById('customerName').value.trim() || 'N/A';
+    const now = new Date();
+    const timeStr = now.toLocaleString('zh-MY');
+    const no = window.receiptNo || "N/A";
+  
+    let itemsHTML = '';
+    let tot = 0;
+  
+    items.forEach(it => {
+      const s = it.weight * it.price;
+      tot += s;
+      itemsHTML += `
+        <tr>
+          <td>${it.product}</td>
+          <td>${it.weight.toFixed(2)}</td>
+          <td>RM ${it.price.toFixed(2)}</td>
+          <td>RM ${s.toFixed(2)}</td>
+        </tr>`;
+    });
+  
+    const htmlContent = `
+      <html><head><meta charset="UTF-8"/>
+      <style>
+        body { font-family: Arial, sans-serif; font-size: 12pt; }
+        .header { text-align:center; font-size: 16pt; font-weight: bold; margin-bottom: 10px; }
+        table { width:100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #000; padding: 6px; text-align: center; }
+        tfoot td { font-weight: bold; background: #f5f5f5; }
+      </style></head>
+      <body>
+        <div class="header"></div>
+        <p><b>客户：</b>${cust}</p>
+        <p><b>编号：</b>${no}</p>
+        <p><b>时间：</b>${timeStr}</p>
+        <table>
+          <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
+          <tbody>${itemsHTML}</tbody>
+          <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
+        </table>
+        <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
+      </body></html>`;
+  
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isIOS) {
+      const printWin = window.open('', '_blank');
+      printWin.document.open();
+      printWin.document.write(htmlContent);
+      printWin.document.close();
+      printWin.focus();
+      printWin.print();
+      printWin.close();
+    } else {
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "absolute";
+      iframe.style.left = "-9999px";
+      document.body.appendChild(iframe);
+  
+      const doc = iframe.contentWindow.document;
+      doc.open();
+      doc.write(htmlContent);
+      doc.close();
+  
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+  
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    }
+  }
+
+  let isSubmitting = false;
+  async function submitToAirtable() {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    document.getElementById('submitButton').disabled = true;
+  
+    const cust = document.getElementById('customerName').value.trim();
+    if (!cust || !items.length) {
+      alert('请填写客户名字并至少添加一个商品！');
+      isSubmitting = false;
+      document.getElementById('submitButton').disabled = false;
+      return;
+    }
+  
+    for (const [i, it] of items.entries()) {
+      const total = it.weight * it.price;
+      const payload = {
+        fields: {
+          "Receipt Number": window.receiptNo,
+          "Customer Name": cust,
+          "Product Name": it.product,
+          "Unit Price": it.price,
+          "Weight": it.weight,
+          "Total Price": total
+        }
+      };
+  
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const errMsg = await res.text();
+          alert(`❌ 第 ${i + 1} 项提交失败：${errMsg}`);
+          isSubmitting = false;
+          document.getElementById('submitButton').disabled = false;
+          return;
+        }
+      } catch (error) {
+        alert(`🚨 第 ${i + 1} 项提交异常: ${error.message}`);
+        isSubmitting = false;
+        document.getElementById('submitButton').disabled = false;
+        return;
+      }
+    }
+  
+    showToast("📤 发票提交成功");
+    printReceipt();
+    
+    items.length = 0;
+    updateInvoice();
+    
+    isSubmitting = false;
+    document.getElementById('submitButton').disabled = false;
+    
+    setTimeout(() => {
+      window.location.href = 'main.html';
+    }, 3000);
+  }
+
+  window.addEventListener('DOMContentLoaded',()=>{
+    document.querySelectorAll('.product-button').forEach(b=>{
+      b.addEventListener('click',()=>selectProduct(b.dataset.name, b));
+    });
+    document.getElementById('addItemBtn').addEventListener('click',addItem);
+    document.getElementById('backBtn').addEventListener('click',()=>window.location.href='main.html');
+    document.getElementById('submitButton').addEventListener('click',submitToAirtable);
+    document.getElementById('customProductInput').addEventListener('input',e=>{
+      const v=e.target.value.trim();
+      document.getElementById('productName').value=v;
+      document.getElementById('selectedProductText').innerText=v||'未选择';
+      document.querySelectorAll('.product-button').forEach(b=>b.classList.remove('active'));
+    });
+  });
+  </script>
+</body>
+</html>
