@@ -1,4 +1,3 @@
-// api/updateStatus.js
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -15,8 +14,10 @@ export default async function handler(req, res) {
   try {
     const { recordId, status } = req.body;
 
+    console.log("🟡 API received:", { recordId, status }); // DEBUG
+
     if (!recordId || !status) {
-      return res.status(400).json({ error: "Missing recordId or status" });
+      return res.status(400).json({ success: false, message: "Missing recordId or status" });
     }
 
     // ✅ PATCH to Airtable
@@ -29,12 +30,13 @@ export default async function handler(req, res) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          fields: { Status: status }, // ✅ use variable
+          fields: { Status: status } // ✅ string from request body
         }),
       }
     );
 
     const data = await updateRes.json();
+    console.log("📥 Airtable response:", data); // DEBUG
 
     if (updateRes.ok) {
       return res.status(200).json({ success: true, data });
@@ -43,6 +45,6 @@ export default async function handler(req, res) {
     }
   } catch (err) {
     console.error("updateStatus error:", err);
-    res.status(500).json({ error: "Server error", details: err.message });
+    res.status(500).json({ success: false, message: "Server error", details: err.message });
   }
 }
