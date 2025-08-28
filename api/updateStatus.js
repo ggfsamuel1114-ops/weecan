@@ -13,17 +13,17 @@ export default async function handler(req, res) {
   const tableName = "Purchases";
 
   try {
-    const { recordId, status } = req.body;   // ✅ expect recordId directly
+    const { recordId, status } = req.body;
 
     if (!recordId || !status) {
-      return res.status(400).json({ success: false, message: "Missing recordId or status" });
+      return res.status(400).json({ error: "Missing recordId or status" });
     }
 
-    // ✅ Direct update by recordId
+    // ✅ PATCH to Airtable
     const updateRes = await fetch(
       `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}/${recordId}`,
       {
-        method: "PATCH",
+        method: "PATCH",   // ⚠️ must be PATCH, not POST
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -37,13 +37,12 @@ export default async function handler(req, res) {
     const data = await updateRes.json();
 
     if (updateRes.ok) {
-      return res.status(200).json({ success: true, data });
+      return res.status(200).json(data);
     } else {
-      return res.status(updateRes.status).json({ success: false, data });
+      return res.status(updateRes.status).json(data);
     }
-
   } catch (err) {
-    console.error("❌ updateStatus error:", err);
-    res.status(500).json({ success: false, message: "Server error", details: err.message });
+    console.error("updateStatus error:", err);
+    res.status(500).json({ error: "Server error", details: err.message });
   }
 }
