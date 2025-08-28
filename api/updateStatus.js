@@ -23,13 +23,13 @@ export default async function handler(req, res) {
     const updateRes = await fetch(
       `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}/${recordId}`,
       {
-        method: "PATCH",   // ⚠️ must be PATCH, not POST
+        method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          fields: { Status: Cancelled },
+          fields: { Status: status }, // ✅ use variable
         }),
       }
     );
@@ -37,9 +37,9 @@ export default async function handler(req, res) {
     const data = await updateRes.json();
 
     if (updateRes.ok) {
-      return res.status(200).json(data);
+      return res.status(200).json({ success: true, data });
     } else {
-      return res.status(updateRes.status).json(data);
+      return res.status(updateRes.status).json({ success: false, data });
     }
   } catch (err) {
     console.error("updateStatus error:", err);
