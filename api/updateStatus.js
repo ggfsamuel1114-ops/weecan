@@ -13,32 +13,13 @@ export default async function handler(req, res) {
   const tableName = "Purchases";
 
   try {
-    const { receiptNo, status } = req.body;
+    const { recordId, status } = req.body;   // ✅ expect recordId directly
 
-    if (!receiptNo || !status) {
-      return res.status(400).json({ error: "Missing receiptNo or status" });
+    if (!recordId || !status) {
+      return res.status(400).json({ success: false, message: "Missing recordId or status" });
     }
 
-    // Step 1: 找到该收据
-    const findRes = await fetch(
-      `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(
-        tableName
-      )}?filterByFormula=${encodeURIComponent(`{Receipt Number} = "${receiptNo}"`)}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    const findData = await findRes.json();
-
-    if (!findData.records || findData.records.length === 0) {
-      return res.status(404).json({ error: "Receipt not found" });
-    }
-
-    const recordId = findData.records[0].id;
-
-    // Step 2: 更新 Status 字段
+    // ✅ Direct update by recordId
     const updateRes = await fetch(
       `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}/${recordId}`,
       {
@@ -54,9 +35,15 @@ export default async function handler(req, res) {
     );
 
     const data = await updateRes.json();
-    return res.status(updateRes.status).json(data);
+
+    if (updateRes.ok) {
+      return res.status(200).json({ success: true, data });
+    } else {
+      return res.status(updateRes.status).json({ success: false, data });
+    }
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error", details: err.message });
+    console.error("❌ updateStatus error:", err);
+    res.status(500).json({ success: false, message: "Server error", details: err.message });
   }
 }
