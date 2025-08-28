@@ -19,6 +19,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing recordId or status" });
     }
 
+    console.log("🟡 Updating Airtable record:", recordId, "with status:", status);
+
     const updateRes = await fetch(
       `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}/${recordId}`,
       {
@@ -28,12 +30,15 @@ export default async function handler(req, res) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          fields: { Status: status }, // ✅ must use the variable
+          fields: {
+            Status: status   // ✅ must be plain string "Cancelled"
+          },
         }),
       }
     );
 
     const data = await updateRes.json();
+    console.log("📥 Airtable response:", data);
 
     if (updateRes.ok) {
       return res.status(200).json({ success: true, data });
@@ -41,7 +46,7 @@ export default async function handler(req, res) {
       return res.status(updateRes.status).json({ success: false, data });
     }
   } catch (err) {
-    console.error("updateStatus error:", err);
+    console.error("🔥 updateStatus error:", err);
     res.status(500).json({ error: "Server error", details: err.message });
   }
 }
