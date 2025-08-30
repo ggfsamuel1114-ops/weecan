@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Weecan Login</title>
+<style>
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #c9e4ff, #e6f0fa);
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.login-box {
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  width: 320px;
+  text-align: center;
+}
+.logo {
+  width: 100px;
+  margin-bottom: 8px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.login-box h2 {
+  margin-top: 5px;
+  margin-bottom: 20px;
+  color: #1a3d66;
+}
+.input-wrapper {
+  position: relative;
+  margin: 8px 0;
+}
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+.toggle-pass {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #007bff;
+  cursor: pointer;
+  user-select: none;
+}
+button {
+  width: 100%;
+  padding: 12px;
+  background: #7cc6ff;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 12px;
+}
+button:hover {
+  background: #2980b9;
+}
+.error {
+  color: red;
+  margin-top: 10px;
+  font-size: 14px;
+}
+</style>
+</head>
+<body>
+<div class="login-box">
+  <img src="images/logo.png" alt="" class="logo">
+
+  <h2>Weecan Login</h2>
+  <input type="text" id="username" placeholder="用户名">
+
+  <div class="input-wrapper">
+    <input type="password" id="password" placeholder="密码">
+    <span class="toggle-pass" onclick="togglePassword()">显示</span>
+  </div>
+
+  <button onclick="login()">登录</button>
+  <p id="errorMsg" class="error"></p>
+</div>
+
+<script>
+// 🔹 这里改成你自己的 Vercel API 域名
+const API_URL = "syve-dinvoice-system.vercel.app/api/login";
+
+function togglePassword() {
+  const passField = document.getElementById("password");
+  const toggle = document.querySelector(".toggle-pass");
+  if (passField.type === "password") {
+    passField.type = "text";
+    toggle.textContent = "隐藏";
+  } else {
+    passField.type = "password";
+    toggle.textContent = "显示";
+  }
+}
+
+async function login() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const errorMsg = document.getElementById("errorMsg");
+
+  errorMsg.textContent = "";
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })  // ✅ 这里改成和后端统一
+    });
+
+    let data = await res.json();
+
+    if (data.token) {
+      // 保存 JWT token
+      localStorage.setItem("token", data.token);
+      alert("登录成功");
+      window.location.href = "main.html"; // ✅ 登录后跳到你主页面
+    } else {
+      errorMsg.textContent = "❌ 用户名或密码错误";
+    }
+  } catch (err) {
+    errorMsg.textContent = "🚨 登录失败，请稍后再试";
+  }
+}
+</script>
+
+</body>
+</html>
