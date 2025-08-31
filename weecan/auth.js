@@ -5,8 +5,8 @@ async function checkAccess() {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    // 没有 token → 跳回登录
-    window.location.href = "login.html";
+    // 没有 token → 跳回 index.html
+    window.location.href = "index.html";
     return;
   }
 
@@ -28,18 +28,18 @@ async function checkAccess() {
     } else {
       console.warn("❌ Token 无效:", data);
       localStorage.removeItem("token");
-      window.location.href = "login.html";
+      window.location.href = "index.html";
     }
   } catch (err) {
     console.error("🚨 验证请求失败:", err);
-    window.location.href = "login.html";
+    window.location.href = "index.html";
   }
 }
 
 // 退出登录
 function logout() {
   localStorage.removeItem("token");
-  window.location.href = "login.html";
+  window.location.href = "index.html"; // ✅ 改这里
 }
 
 // ✅ 确保函数能在 HTML onclick 调用
