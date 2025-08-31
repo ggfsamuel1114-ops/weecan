@@ -5,9 +5,19 @@ export default function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { username, password } = JSON.parse(req.body);
+  // 处理 body
+  let body = req.body;
+  if (typeof body === "string") {
+    try {
+      body = JSON.parse(body);
+    } catch (e) {
+      return res.status(400).json({ error: "Invalid JSON body" });
+    }
+  }
 
-  // 🔹 从 Vercel 环境变量里读取
+  const { username, password } = body;
+
+  // 从环境变量读取
   const adminUser = process.env.ADMIN_USER;
   const adminPass = process.env.ADMIN_PASS;
 
