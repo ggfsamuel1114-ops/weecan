@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-MY">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weecan System</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+    
+    /* 按钮和标题的容器，最大宽度 900px */
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    /* 功能按钮区（2列） */
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    /* 报表按钮区（3列） */
+    .reports {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    
+    /* 按钮样式 */
+    .button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      text-decoration: none;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      transition: transform 0.15s, background 0.3s;
+      text-align: center;
+      cursor: pointer;
+    }
+    .button:hover {
+      transform: translateY(-2px);
+    }
+    
+    /* 收购类按钮（绿色） */
+    .btn-purchase {
+      background: #27ae60;
+    }
+    .btn-purchase:hover {
+      background: #219150;
+    }
+    
+    /* 销售类按钮（橙色） */
+    .btn-sales {
+      background: #e67e22;
+    }
+    .btn-sales:hover {
+      background: #cf6717;
+    }
+
+    /* 分析类按钮（蓝色） */
+    .btn-analysis {
+      background: #2980b9;
+    }
+    .btn-analysis:hover {
+      background: #1f6693;
+    }
+    
+    /* 报表显示区（analysis） */
+    #report-container {
+      margin: 30px auto;      /* 居中 */
+      width: 98%;             /* 占屏幕 98% 宽度，几乎全屏 */
+      max-width: none;        /* 不限制最大宽度 */
+      height: 850px;          /* 高度自己调 */
+      display: none;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 10px;
+    }
+    
+    #reportFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 8px;
+    }
+
+    /* Loading 遮罩 */
+    #loadingOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;                /* 默认隐藏 */
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+    }
+    #loadingOverlay div {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 10px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div style="position: absolute; top: 20px; right: 20px;">
+    <span id="welcome" style="margin-right:15px; font-weight:bold;"></span>
+    <button onclick="logout()">退出登录</button>
+  </div>
+  
+  <h1>📋 Durian Invoice System</h1>
+
+  <!-- 主容器 -->
+  <div class="container">
+
+    <!-- 功能按钮区 -->
+    <div class="buttons">
+      <a class='button btn-purchase' href='Purchase.html'>🧾 收购</a>
+      <a class='button btn-sales' href='Sales.html'>💰 销售</a>
+      <a class='button btn-purchase' href='purchasereceipt.html'>🖨️ 打印/编辑收果单据</a>
+      <a class='button btn-sales' href='salesreceipt.html'>🖨️ 打印/编辑卖果单据</a>
+    </div>
+
+    <!-- 报表按钮区 -->
+    <div class="reports">
+      <button class='button btn-analysis' onclick="loadReport('https://airtable.com/embed/appC0yAd0xabao41y/shrO1jUBSthFYKs2V?backgroundColor=green&viewControls=on')">📊 买果统计</button>
+      <button class='button btn-analysis' onclick="loadReport('https://airtable.com/embed/appC0yAd0xabao41y/shrrNje5THb1FkVQF?backgroundColor=orange&viewControls=on')">📊 营业统计</button>
+      <button class='button btn-analysis' onclick="loadReport('https://airtable.com/embed/appC0yAd0xabao41y/shrIl4bEMYBqmyMer?backgroundColor=blue&viewControls=on')">📈 均价走向</button>
+    </div>
+
+    <!-- 报表显示区 -->
+    <div id="report-container">
+      <iframe id="reportFrame" src="" frameborder="0"></iframe>
+    </div>
+
+  </div>
+
+  <!-- Loading 遮罩 -->
+  <div id="loadingOverlay">
+    <div>
+      <div class="spinner"></div>
+      <span>正在加载报表，请稍候...</span>
+    </div>
+  </div>
+
+  <script>
+    function loadReport(url) {
+      const overlay = document.getElementById("loadingOverlay");
+      overlay.style.display = "flex"; // 显示加载中
+
+      const iframe = document.getElementById("reportFrame");
+      iframe.style.display = "none";  // 隐藏旧内容，避免闪烁
+
+      iframe.onload = function () {
+        overlay.style.display = "none"; // 报表加载完关闭 loading
+        iframe.style.display = "block"; // 显示报表
+      };
+
+      iframe.src = url;
+      document.getElementById("report-container").style.display = "block";
+    }
+  </script>
+  <script src="auth.js"></script>
+</body>
+</html>
