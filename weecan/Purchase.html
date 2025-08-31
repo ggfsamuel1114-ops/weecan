@@ -1,0 +1,478 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="zh-MY">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weecan Invoice</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #fdf8f3;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+    @media (min-width: 700px) {
+      body { flex-direction: row; }
+    }
+    .input-area, .preview-area {
+      flex: 1;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 10px;
+      background: #fff8f0;
+      box-shadow: 0 0 10px rgba(200,150,100,0.1);
+    }
+    h3, h4 { color: #5e4638; }
+    .button-group button, button {
+      padding: 12px 18px;
+      margin: 5px;
+      font-size: 16px;
+      background: #d2e5f3;
+      color: #333;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .button-group button:hover, button:hover {
+      background: #bdd9eb;
+    }
+    .product-button.active {
+      background: #a5e6be !important;
+      border: 2px solid #49a97f;
+    }
+    input {
+      padding: 12px;
+      font-size: 16px;
+      margin: 5px 0;
+      border: 1px solid #aaccee;
+      border-radius: 10px;
+      background: #ffffff;
+    }
+    .invoice-box input[type="number"] {
+      width: 80px;
+      padding: 6px 8px;
+      font-size: 15px;
+      border: 1px solid #aaccee;
+      border-radius: 8px;
+      text-align: right;
+      background: #f9fcff;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .invoice-box td { vertical-align: middle; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th { background: #f3e4d7; color: #5e4638; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+
+    /* Toast 样式 */
+    #toast {
+      visibility: hidden;
+      min-width: 200px;
+      background: #4caf50;
+      color: #fff;
+      text-align: center;
+      border-radius: 8px;
+      padding: 12px;
+      position: fixed;
+      z-index: 1000;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%);
+      font-size: 16px;
+    }
+
+    /* Loading 遮罩 */
+    #loadingOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    #loadingOverlay div {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 10px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* 弹出输入面板 */
+    #popupInput {
+      position: absolute;
+      background: #fffbe8;
+      border: 1px solid #d4b06a;
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      display: none;
+      z-index: 500;
+    }
+    #popupInput h5 {
+      margin: 4px 0;
+      font-size: 14px;
+      color: #5e4638;
+    }
+    #popupInput input {
+      width: 100px;
+      margin-bottom: 6px;
+      padding: 6px;
+      font-size: 14px;
+    }
+    
+    #customProductInput {
+      display: inline-block;
+      padding: 12px 18px;
+      margin: 5px;
+      font-size: 16px;
+      border: 2px dashed #7cc6ff;
+      border-radius: 12px;
+      background: #ffffff;
+      color: #1a3d66;
+      min-width: 140px;
+      box-sizing: border-box;
+      text-align: center;   /* 🔑 输入内容居中 */
+    }
+    
+    /* 点击时高亮 */
+    #customProductInput:focus {
+      outline: none;
+      border-color: #2980b9;
+      background: #e6f3ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="input-area">
+    <h3>🧾 Name</h3>
+    <input type="text" id="customerName" placeholder="客户名字 (必填)" />
+
+    <h4>🍈 Musang</h4>
+    <div class="button-group">
+      <button class="product-button" data-name="Musang AM">AM</button>
+      <button class="product-button" data-name="Musang ABM">ABM</button>
+      <button class="product-button" data-name="Musang BM">BM</button>
+      <button class="product-button" data-name="Musang CM">CM</button>
+      <button class="product-button" data-name="Musang CCM">CCM</button>
+      <button class="product-button" data-name="Musang CCCM">CCCM</button>
+    </div>
+
+    <h4>🌑 Black Thorn</h4>
+    <div class="button-group">
+      <button class="product-button" data-name="BTA">BTA</button>
+      <button class="product-button" data-name="BTB">BTB</button>
+      <button class="product-button" data-name="BTC">BTC</button>
+      <button class="product-button" data-name="BTCC">BTCC</button>
+    </div>
+
+    <h4>🌕 D24</h4>
+    <div class="button-group">
+      <button class="product-button" data-name="D24A">D24A</button>
+      <button class="product-button" data-name="D24B">D24B</button>
+      <button class="product-button" data-name="D24C">D24C</button>
+    </div>
+
+    <h4>🍃 其他品种</h4>
+    <div class="button-group">
+      <button class="product-button" data-name="Kampung">Kampung</button>
+      <button class="product-button" data-name="KC">KC</button>
+      <button class="product-button" data-name="Kahwin">KW</button>
+      <input type="text" id="customProductInput" placeholder="输入自定义产品名称" />
+    </div>
+    
+    <div style="margin-top:15px; display:flex; justify-content:flex-end; gap:15px;">
+      <button type="button" id="backBtn">⬅️ Back</button>
+    </div>
+  </div>
+
+  <div class="preview-area">
+    <h3>📋 Invoice Overview</h3>
+    <div class="invoice-box">
+      <table>
+        <thead>
+          <tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th><th>操作</th></tr>
+        </thead>
+        <tbody id="invoiceItems"></tbody>
+      </table>
+      <p><strong>总计：</strong>RM <span id="totalAmount">0.00</span></p>
+    </div>
+    <div style="margin-top:15px;text-align:right;">
+      <button type="button" id="submitButton" style="display:none;">📤 提交到 Airtable</button>
+    </div>
+  </div>
+
+  <!-- 弹出输入面板 -->
+  <div id="popupInput">
+    <div><b id="popupProductName"></b></div>
+    <h5>重量（KG）</h5>
+    <input type="number" id="popupWeight" placeholder="重量" />
+    <h5>单价（RM）</h5>
+    <input type="number" id="popupPrice" placeholder="单价" />
+    <button type="button" onclick="confirmPopup()">确定</button>
+  </div>
+
+  <!-- Toast 容器 -->
+  <div id="toast"></div>
+
+  <!-- Loading 遮罩 -->
+  <div id="loadingOverlay">
+    <div>
+      <div class="spinner"></div>
+      <span id="loadingText">正在提交，请稍候...</span>
+    </div>
+  </div>
+
+  <script>
+  const API_URL = "https://syve-dinvoice-system.vercel.app/api/token";
+  const items = [];
+  window.receiptNo = generateReceiptNo();
+
+  function generateReceiptNo() {
+    const now = new Date();
+    const ymd = now.toISOString().slice(2,10).replace(/-/g,"");
+    const rand = Math.floor(1000 + Math.random()*9000);
+    return `RCPT-${ymd}-${rand}`;
+  }
+
+  let currentProduct = null;
+
+  function selectProduct(name, btn) {
+    currentProduct = name;
+    document.getElementById('popupProductName').innerText = "🧺 " + name;
+
+    const rect = btn.getBoundingClientRect();
+    const popup = document.getElementById('popupInput');
+
+    popup.style.top = (window.scrollY + rect.bottom + 8) + "px";
+    popup.style.left = (window.scrollX + rect.left) + "px";
+    popup.style.display = "block";
+  }
+
+  function confirmPopup() {
+    const w = parseFloat(document.getElementById('popupWeight').value);
+    const p = parseFloat(document.getElementById('popupPrice').value);
+    const prod = currentProduct;
+
+    if(prod && !isNaN(w) && !isNaN(p)) {
+      items.push({product:prod, weight:w, price:p});
+      updateInvoice();
+      showToast("✅ 添加成功");
+    } else {
+      alert("请填写重量和单价！");
+      return;
+    }
+
+    document.getElementById('popupWeight').value = "";
+    document.getElementById('popupPrice').value = "";
+    document.getElementById('popupInput').style.display = "none";
+  }
+
+  function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.style.visibility = "visible";
+    setTimeout(() => {
+      toast.style.visibility = "hidden";
+    }, 2000);
+  }
+
+  function updateInvoice() {
+    const tbody = document.getElementById('invoiceItems'); tbody.innerHTML='';
+    let total=0;
+    items.forEach((it,i)=>{
+      const sub=it.weight*it.price; total+=sub;
+      tbody.insertAdjacentHTML('beforeend',
+        `<tr><td>${it.product}</td><td><input type="number" value="${it.weight}" onchange="editItem(${i},'weight',this.value)"></td>` +
+        `<td><input type="number" value="${it.price.toFixed(2)}" onchange="editItem(${i},'price',this.value)"></td>`+
+        `<td>${sub.toFixed(2)}</td><td><button type="button" onclick="deleteItem(${i})">❌ 删除</button></td></tr>`);
+    });
+    document.getElementById('totalAmount').innerText = total.toFixed(2);
+    document.getElementById('submitButton').style.display = items.length ? 'inline-block':'none';
+  }
+
+  function deleteItem(i){ if(confirm('确定要删除这一项吗？')){ items.splice(i,1); updateInvoice(); }}
+  function editItem(i,f,v){ const n=parseFloat(v); if(!isNaN(n)){ items[i][f]=n; updateInvoice(); }}
+
+  function printReceipt() {
+    const cust = document.getElementById('customerName').value.trim() || 'N/A';
+    const now = new Date();
+    const timeStr = now.toLocaleString('zh-MY');
+    const no = window.receiptNo || "N/A";
+  
+    let itemsHTML = '';
+    let tot = 0;
+  
+    items.forEach(it => {
+      const s = it.weight * it.price;
+      tot += s;
+      itemsHTML += `<tr><td>${it.product}</td><td>${it.weight.toFixed(2)}</td><td>RM ${it.price.toFixed(2)}</td><td>RM ${s.toFixed(2)}</td></tr>`;
+    });
+  
+    const htmlContent = `
+      <html><head><meta charset="UTF-8"/>
+      <style>
+        body { font-family: Arial, sans-serif; font-size: 12pt; }
+        .header { text-align:center; font-size: 16pt; font-weight: bold; margin-bottom: 10px; }
+        table { width:100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #000; padding: 6px; text-align: center; }
+        tfoot td { font-weight: bold; background: #f5f5f5; }
+      </style></head>
+      <body>
+        <div class="header"></div>
+        <div class="header">收果 Receipt</div>
+        <p><b>客户：</b>${cust}</p>
+        <p><b>编号：</b>${no}</p>
+        <p><b>时间：</b>${timeStr}</p>
+        <table>
+          <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
+          <tbody>${itemsHTML}</tbody>
+          <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
+        </table>
+        <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
+      </body></html>`;
+  
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "absolute";
+    iframe.style.left = "-9999px";
+    document.body.appendChild(iframe);
+  
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(htmlContent);
+    doc.close();
+  
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+  
+    setTimeout(() => document.body.removeChild(iframe), 1000);
+  }
+
+  let isSubmitting = false;
+  async function submitToAirtable() {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    document.getElementById('submitButton').disabled = true;
+  
+    const cust = document.getElementById('customerName').value.trim();
+    if (!cust || !items.length) {
+      alert('请填写客户名字并至少添加一个商品！');
+      isSubmitting = false;
+      document.getElementById('submitButton').disabled = false;
+      return;
+    }
+
+    showLoading("正在提交，请稍候...");
+  
+    try {
+      for (const [i, it] of items.entries()) {
+        const total = it.weight * it.price;
+        const payload = {
+          fields: {
+            "Receipt Number": window.receiptNo,
+            "Customer Name": cust,
+            "Product Name": it.product,
+            "Unit Price": it.price,
+            "Weight": it.weight,
+            "Total Price": total
+          }
+        };
+  
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const errMsg = await res.text();
+          alert(`❌ 第 ${i + 1} 项提交失败：${errMsg}`);
+          hideLoading();
+          isSubmitting = false;
+          document.getElementById('submitButton').disabled = false;
+          return;
+        }
+      }
+
+      document.getElementById("loadingText").innerText = "✅ 提交成功，正在跳转...";
+      printReceipt();
+      items.length = 0;
+      updateInvoice();
+  
+      setTimeout(() => {
+        window.location.href = 'main.html';
+      }, 2000);
+  
+    } catch (error) {
+      alert(`🚨 提交异常: ${error.message}`);
+      hideLoading();
+    } finally {
+      isSubmitting = false;
+      document.getElementById('submitButton').disabled = false;
+    }
+  }
+
+  function showLoading(msg="正在提交，请稍候...") {
+    document.getElementById("loadingText").innerText = msg;
+    document.getElementById("loadingOverlay").style.display = "flex";
+  }
+  function hideLoading() {
+    document.getElementById("loadingOverlay").style.display = "none";
+  }
+
+  window.addEventListener('DOMContentLoaded',()=>{
+      document.querySelectorAll('.product-button').forEach(b=>{
+        b.addEventListener('click',()=>selectProduct(b.dataset.name, b));
+      });
+      document.getElementById('submitButton').addEventListener('click',submitToAirtable);
+      document.getElementById('backBtn').addEventListener('click', () => {
+        window.location.href = 'main.html';
+      });
+
+      document.getElementById('customProductInput').addEventListener('input',e=>{
+        const v=e.target.value.trim();
+        if(v){
+          currentProduct = v;
+          document.getElementById('popupProductName').innerText = "🧺 " + v;
+          const input = e.target;
+          const rect = input.getBoundingClientRect();
+          const popup = document.getElementById('popupInput');
+          popup.style.top = (window.scrollY + rect.bottom + 8) + "px";
+          popup.style.left = (window.scrollX + rect.left) + "px";
+          popup.style.display = "block";
+        } else {
+          document.getElementById('popupInput').style.display="none";
+        }
+      });
+    
+      // 🟡 加在这里
+      document.addEventListener('click', (e) => {
+        const popup = document.getElementById('popupInput');
+        if (!popup.contains(e.target) && !e.target.classList.contains('product-button') && e.target.id !== 'customProductInput') {
+          popup.style.display = "none";
+        }
+      });
+    });
+
+  </script>
+</body>
+</html>
