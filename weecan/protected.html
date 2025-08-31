@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Main Page</title>
+<style>
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f0f4f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.container {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h2 id="welcome">Loading...</h2>
+  <button onclick="logout()">退出登录</button>
+</div>
+
+<script>
+async function checkAccess() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = "login.html"; // 没 token → 回登录
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/protected", {
+      headers: { Authorization: "Bearer " + token }
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      document.getElementById("welcome").innerText = "欢迎你，" + data.user + " 🎉";
+    } else {
+      alert("登录失效，请重新登录");
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+    }
+  } catch (err) {
+    alert("服务器错误，请重试");
+    window.location.href = "login.html";
+  }
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
+}
+
+checkAccess(); // 页面加载时自动检查
+</script>
+</body>
+</html>
