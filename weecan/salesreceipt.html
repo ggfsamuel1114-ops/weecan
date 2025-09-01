@@ -327,47 +327,42 @@
       });
     
       const htmlContent = `
-        <div style="font-family: Arial, sans-serif; font-size: 12pt;">
-          <div style="text-align:center; font-size: 16pt; font-weight: bold; margin-bottom: 10px;">Sales Invoice</div>
-          <p><b>客户：</b>${cust}</p>
-          <p><b>编号：</b>${receiptNo}</p>
-          <p><b>时间：</b>${timeStr}</p>
-          <table style="width:100%; border-collapse: collapse; margin-top: 10px;" border="1">
-            <thead>
-              <tr>
-                <th>果类</th>
-                <th>重量</th>
-                <th>单价</th>
-                <th>小计</th>
-              </tr>
-            </thead>
-            <tbody>${itemsHTML}</tbody>
-            <tfoot>
-              <tr>
-                <td colspan="3">总计</td>
-                <td><b>RM ${tot.toFixed(2)}</b></td>
-              </tr>
-            </tfoot>
-          </table>
-          <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
-        </div>
+        <html>
+          <head>
+            <meta charset="UTF-8"/>
+            <title>Receipt</title>
+            <style>
+              body { font-family: Arial, sans-serif; font-size: 12pt; }
+              .header { text-align:center; font-size: 16pt; font-weight: bold; margin-bottom: 10px; }
+              table { width:100%; border-collapse: collapse; margin-top: 10px; }
+              th, td { border: 1px solid #000; padding: 6px; text-align: center; }
+              th { background: #f5f5f5; }
+              tfoot td { font-weight: bold; }
+            </style>
+          </head>
+          <body>
+            <div class="header">Sales Invoice</div>
+            <p><b>客户：</b>${cust}</p>
+            <p><b>编号：</b>${receiptNo}</p>
+            <p><b>时间：</b>${timeStr}</p>
+            <table>
+              <thead><tr><th>果类</th><th>重量</th><th>单价</th><th>小计</th></tr></thead>
+              <tbody>${itemsHTML}</tbody>
+              <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
+            </table>
+            <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
+          </body>
+        </html>
       `;
     
-      // 🟡 保存原始页面
-      const originalContent = document.body.innerHTML;
+      // 🟡 用 Blob 生成一个临时 HTML 页面
+      const blob = new Blob([htmlContent], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
     
-      // 替换成收据
-      document.body.innerHTML = htmlContent;
-    
-      // 调用打印
-      window.print();
-    
-      // 打印结束后恢复原始页面
-      document.body.innerHTML = originalContent;
-    
-      // 🟡 重新绑定事件（否则按钮可能失效）
-      location.reload();
+      // 🟡 替换当前页面 → 打开收据
+      window.location.href = url;
     }
+
 
 
     fetchAllReceipts().then(records => {
