@@ -13,64 +13,17 @@
     .pagination { margin-top: 15px; }
     .pagination button { margin: 0 5px; }
 
-    /* 模态弹窗 */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 999;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center; align-items: center;
-    }
-    .modal-content {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    .modal-close {
-      background: #e74c3c; color: white;
-      border: none; padding: 6px 12px;
-      border-radius: 6px; cursor: pointer;
-      float: right;
-    }
+    .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+    .modal-content { background: #fff; padding: 20px; border-radius: 10px; width: 90%; max-width: 500px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .modal-close { background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; float: right; }
 
-    /* 🟡 Loading 遮罩 */
-    #loadingOverlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.4);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-    }
-    #loadingOverlay div {
-      background: white;
-      padding: 20px 30px;
-      border-radius: 10px;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 2000; }
+    #loadingOverlay div { background: white; padding: 20px 30px; border-radius: 10px; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+    .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
+  <!-- 引入 jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <h2>Sales History</h2>
@@ -105,7 +58,7 @@
     </div>
   </div>
 
-  <!-- 🟡 Loading 遮罩 -->
+  <!-- Loading 遮罩 -->
   <div id="loadingOverlay">
     <div>
       <div class="spinner"></div>
@@ -115,44 +68,31 @@
 
   <script>
     const API_URL = "https://syve-dinvoice-system.vercel.app/api/salesreceipt";
-    
     let allRecords = [], uniqueRows = [];
     let currentPage = 1, rowsPerPage = 20, filteredRows = [];
 
-    function showLoading() {
-      document.getElementById("loadingOverlay").style.display = "flex";
-    }
-    function hideLoading() {
-      document.getElementById("loadingOverlay").style.display = "none";
-    }
+    function showLoading() { document.getElementById("loadingOverlay").style.display = "flex"; }
+    function hideLoading() { document.getElementById("loadingOverlay").style.display = "none"; }
 
     async function fetchAllReceipts() {
       showLoading();
       try {
         const res = await fetch(API_URL);
         let records = await res.json();
-        records.forEach(r => {
-          if (!r.fields["Status"]) {
-            r.fields["Status"] = "Active";
-          }
-        });
+        records.forEach(r => { if (!r.fields["Status"]) r.fields["Status"] = "Active"; });
         return records;
-      } finally {
-        hideLoading();
-      }
+      } finally { hideLoading(); }
     }
 
-    function sendBack() {
-      window.location.href = 'main.html';
-    }
-    
+    function sendBack() { window.location.href = 'main.html'; }
+
     function renderTable(page = 1) {
       const tbody = document.querySelector("#historyTable tbody");
       tbody.innerHTML = "";
       const start = (page - 1) * rowsPerPage;
       const end = start + rowsPerPage;
       const pageData = filteredRows.slice(start, end);
-    
+
       pageData.forEach(rec => {
         const f = rec.fields;
         const no = f["Receipt Number"] || "—";
@@ -168,27 +108,25 @@
         });
 
         const status = f["Status"] || "Active";
-    
-        tbody.insertAdjacentHTML(
-          "beforeend",
-          `<tr>
+        tbody.insertAdjacentHTML("beforeend", `
+          <tr>
             <td>${no}</td>
             <td>${name}</td>
             <td>${time}</td>
             <td>${totalAmount.toFixed(2)}</td>
             <td>
-              ${status === "Cancelled" 
-                ? "<span style='color:red;font-weight:bold'>已取消</span>" 
+              ${status === "Cancelled"
+                ? "<span style='color:red;font-weight:bold'>已取消</span>"
                 : `
                   <button onclick="viewOne('${no}')">👁️ 查看</button>
                   <button onclick="printOne('${no}')">🖨️ 打印</button>
                   <button onclick="cancelReceipt('${rec.id}', '${no}')">❌ 取消</button>
                 `}
             </td>
-          </tr>`
-        );
+          </tr>
+        `);
       });
-    
+
       document.getElementById("pageInfo").textContent =
         `第 ${currentPage} 页 / 共 ${Math.ceil(filteredRows.length / rowsPerPage)} 页（共 ${filteredRows.length} 条记录）`;
     }
@@ -208,13 +146,7 @@
         const price = parseFloat(r.fields["Unit Price"]) || 0;
         const subtotal = weight * price;
         tot += subtotal;
-        itemsHTML += `
-          <tr>
-            <td>${product}</td>
-            <td>${weight.toFixed(2)} kg</td>
-            <td>RM ${price.toFixed(2)}</td>
-            <td>RM ${subtotal.toFixed(2)}</td>
-          </tr>`;
+        itemsHTML += `<tr><td>${product}</td><td>${weight.toFixed(2)} kg</td><td>RM ${price.toFixed(2)}</td><td>RM ${subtotal.toFixed(2)}</td></tr>`;
       });
 
       document.getElementById("modalBody").innerHTML = `
@@ -227,26 +159,19 @@
           <tfoot><tr><td colspan="3"><strong>总计</strong></td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
         </table>
       `;
-
       document.getElementById("receiptModal").style.display = "flex";
     }
 
-    function closeModal() {
-      document.getElementById("receiptModal").style.display = "none";
-    }
+    function closeModal() { document.getElementById("receiptModal").style.display = "none"; }
 
     async function cancelReceipt(recordId, receiptNo) {
       if (!confirm(`确定要取消收据 ${receiptNo} 吗？`)) return;
       showLoading();
-
       try {
         const payload = { recordId, status: "Cancelled" };
         const res = await fetch("https://syve-dinvoice-system.vercel.app/api/updateSaleStatus", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
         });
-
         const result = await res.json();
         if (result.success) {
           alert("✅ 收据已取消！");
@@ -256,11 +181,8 @@
         } else {
           alert("❌ 取消失败: " + (result.error?.message || "未知错误"));
         }
-      } catch (err) {
-        alert("❌ 网络错误，无法取消收据");
-      } finally {
-        hideLoading();
-      }
+      } catch { alert("❌ 网络错误，无法取消收据"); }
+      finally { hideLoading(); }
     }
 
     function filterTable() {
@@ -287,86 +209,49 @@
       renderTable();
     }
 
-    function prevPage() {
-      if (currentPage > 1) {
-        currentPage--;
-        renderTable(currentPage);
-      }
-    }
+    function prevPage() { if (currentPage > 1) { currentPage--; renderTable(currentPage); } }
+    function nextPage() { if (currentPage < Math.ceil(filteredRows.length / rowsPerPage)) { currentPage++; renderTable(currentPage); } }
 
-    function nextPage() {
-      if (currentPage < Math.ceil(filteredRows.length / rowsPerPage)) {
-        currentPage++;
-        renderTable(currentPage);
-      }
-    }
-    
-    // 🟡 打印：不新开窗口，直接替换 body → 打印 → 恢复
+    // 🟡 新版打印 → 导出 PDF
     function printOne(receiptNo) {
-      // 1. 找到该收据的所有记录
       const rows = allRecords.filter(r => r.fields["Receipt Number"] === receiptNo);
       if (!rows.length) return alert("找不到该收据");
-    
+
       const cust = rows[0].fields["Customer Name"] || "N/A";
       const timeStr = new Date(rows[0].fields["Time Stamp"]).toLocaleString("zh-MY");
-    
-      // 2. 拼装商品行
-      let itemsHTML = "";
+
       let tot = 0;
+      let content = `Sales Invoice\n\n客户: ${cust}\n编号: ${receiptNo}\n时间: ${timeStr}\n\n商品:\n`;
+      content += "----------------------------------------------\n";
+      content += "品名     重量(kg)  单价(RM)  小计(RM)\n";
+      content += "----------------------------------------------\n";
+
       rows.forEach(r => {
         const product = r.fields["Product Name"] || "";
         const weight = parseFloat(r.fields["Weight"]) || 0;
         const price = parseFloat(r.fields["Unit Price"]) || 0;
         const subtotal = weight * price;
         tot += subtotal;
-        itemsHTML += `
-          <tr>
-            <td>${product}</td>
-            <td>${weight.toFixed(2)} kg</td>
-            <td>RM ${price.toFixed(2)}</td>
-            <td>RM ${subtotal.toFixed(2)}</td>
-          </tr>`;
+        content += `${product.padEnd(6)} ${weight.toFixed(2).padStart(6)}  ${price.toFixed(2).padStart(7)}  ${subtotal.toFixed(2).padStart(8)}\n`;
       });
-    
-      // 3. 要打印的 HTML
-      const printContent = `
-        <div style="font-family:Arial,sans-serif;font-size:12pt;">
-          <div style="text-align:center;font-size:16pt;font-weight:bold;margin-bottom:10px">Sales Invoice</div>
-          <p><b>客户：</b>${cust}</p>
-          <p><b>编号：</b>${receiptNo}</p>
-          <p><b>时间：</b>${timeStr}</p>
-          <table style="width:100%;border-collapse:collapse;margin-top:10px" border="1">
-            <thead><tr><th>果类</th><th>重量</th><th>单价</th><th>小计</th></tr></thead>
-            <tbody>${itemsHTML}</tbody>
-            <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
-          </table>
-          <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
-        </div>
-      `;
-    
-      // 4. 保存原页面，替换成收据内容
-      const oldContent = document.body.innerHTML;
-      document.body.innerHTML = printContent;
-    
-      // 5. 打印（此时就是在「当前页面」触发 → 手机可以打印）
-      window.print();
-    
-      // 6. 恢复原来的页面
-      document.body.innerHTML = oldContent;
-      window.location.reload();
+
+      content += "----------------------------------------------\n";
+      content += `总计: RM ${tot.toFixed(2)}\n\n❀ Thank You ❀`;
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: "mm", format: "a4" });
+      doc.setFont("courier", "normal");
+      doc.setFontSize(12);
+      doc.text(content, 10, 10);
+      doc.save(`invoice-${receiptNo}.pdf`);
     }
-
-
 
     fetchAllReceipts().then(records => {
       allRecords = records;
       const seen = new Set();
       records.forEach(r => {
         const n = r.fields["Receipt Number"];
-        if (!seen.has(n)) {
-          uniqueRows.push(r);
-          seen.add(n);
-        }
+        if (!seen.has(n)) { uniqueRows.push(r); seen.add(n); }
       });
       filteredRows = uniqueRows;
       renderTable();
