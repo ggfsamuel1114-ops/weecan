@@ -221,6 +221,7 @@
       const timeStr = new Date(rows[0].fields["Time Stamp"]).toLocaleString("en-GB");
     
       let tot = 0;
+      let itemsHTML = "";
       let itemsText = "----------------------------------------------\n";
       itemsText += "Item        Weight(kg)  Price(RM)   Subtotal(RM)\n";
       itemsText += "----------------------------------------------\n";
@@ -232,6 +233,16 @@
         const subtotal = weight * price;
         tot += subtotal;
     
+        // HTML 格式（电脑）
+        itemsHTML += `
+          <tr>
+            <td>${product}</td>
+            <td>${weight.toFixed(2)} kg</td>
+            <td>RM ${price.toFixed(2)}</td>
+            <td>RM ${subtotal.toFixed(2)}</td>
+          </tr>`;
+    
+        // 文本格式（手机 PDF）
         itemsText += product.padEnd(12) +
                      weight.toFixed(2).padStart(8) + "   " +
                      price.toFixed(2).padStart(8) + "   " +
@@ -241,21 +252,40 @@
       itemsText += "----------------------------------------------\n";
       itemsText += `Total : RM ${tot.toFixed(2)}\n\n*** Thank You ***`;
     
-      // 检测设备
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     
       if (!isMobile) {
-        // 💻 电脑直接打印
+        // 💻 电脑 → HTML 格式打印
         const printContent = `
-          <pre style="font-family:Courier,monospace;font-size:12pt;">
-    Sales Invoice
-    
-    Customer : ${cust}
-    Invoice  : ${receiptNo}
-    Date     : ${timeStr}
-    
-    ${itemsText}
-          </pre>
+          <html>
+            <head>
+              <meta charset="UTF-8"/>
+              <style>
+                body { font-family: Arial, sans-serif; font-size: 12pt; }
+                .header { text-align:center; font-size: 16pt; font-weight: bold; margin-bottom: 10px; }
+                table { width:100%; border-collapse: collapse; margin-top: 10px; }
+                th, td { border: 1px solid #000; padding: 6px; text-align: center; }
+                th { background: #f5f5f5; }
+                tfoot td { font-weight: bold; background: #f5f5f5; text-align: center; }
+              </style>
+            </head>
+            <body>
+              <div class="header">Sales Invoice</div>
+              <p><b>Customer:</b> ${cust}</p>
+              <p><b>Invoice:</b> ${receiptNo}</p>
+              <p><b>Date:</b> ${timeStr}</p>
+              <table>
+                <thead>
+                  <tr><th>Item</th><th>Weight</th><th>Price</th><th>Subtotal</th></tr>
+                </thead>
+                <tbody>${itemsHTML}</tbody>
+                <tfoot>
+                  <tr><td colspan="3">Total</td><td>RM ${tot.toFixed(2)}</td></tr>
+                </tfoot>
+              </table>
+              <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
+            </body>
+          </html>
         `;
     
         const oldContent = document.body.innerHTML;
@@ -263,8 +293,9 @@
         window.print();
         document.body.innerHTML = oldContent;
         window.location.reload();
+    
       } else {
-        // 📱 手机导出 PDF
+        // 📱 手机 → PDF 文本格式
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ unit: "mm", format: "a4" });
         doc.setFont("courier", "normal");
@@ -275,6 +306,7 @@
         doc.save("invoice-" + receiptNo + ".pdf");
       }
     }
+
 
 
     fetchAllReceipts().then(records => {
