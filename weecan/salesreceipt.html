@@ -264,14 +264,14 @@
         const doc = new jsPDF({ unit: "mm", format: "a4" });
         doc.setFont("courier", "normal");
         doc.setFontSize(12);
-
+      
         let content = `Sales Invoice\n\n客户: ${cust}\n编号: ${receiptNo}\n时间: ${timeStr}\n\n`;
         content += itemsText;
         content += "-----------------------------------------\n";
         content += `总计: RM ${tot.toFixed(2)}\n\n❀ Thank You ❀`;
-
+      
         doc.text(content, 10, 10);
-        doc.save(\`invoice-\${receiptNo}.pdf\`);
+        doc.save("invoice-" + receiptNo + ".pdf");
       }
     }
 
