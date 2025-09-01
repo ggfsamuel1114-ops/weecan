@@ -200,8 +200,8 @@
     }
 
       document.addEventListener("DOMContentLoaded", function() {
-        const user = localStorage.getItem("username"); // auth.js 登录后应该保存用户名
-        if (!user) {
+        const token = localStorage.getItem("token"); // auth.js 登录时存的 token
+        if (!token) {
           document.body.innerHTML = `
             <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
               <h2 style="color:#e74c3c;">❌ Access Denied</h2>
@@ -212,10 +212,11 @@
             </div>
           `;
         } else {
-          // 如果有登录，显示欢迎语
-          document.getElementById("welcome").textContent = "👋 Welcome, " + user;
+          // 如果 token 存在，就显示欢迎语
+          document.getElementById("welcome").textContent = "👋 Welcome!";
         }
       });
+
   </script>
   <script src="auth.js"></script>
 </body>
