@@ -215,65 +215,67 @@
     // 🟡 打印函数：电脑用 window.print，手机用 jsPDF
     function printOne(receiptNo) {
       const rows = allRecords.filter(r => r.fields["Receipt Number"] === receiptNo);
-      if (!rows.length) return alert("找不到该收据");
-
+      if (!rows.length) return alert("Invoice not found");
+    
       const cust = rows[0].fields["Customer Name"] || "N/A";
-      const timeStr = new Date(rows[0].fields["Time Stamp"]).toLocaleString("zh-MY");
-
+      const timeStr = new Date(rows[0].fields["Time Stamp"]).toLocaleString("en-GB");
+    
       let tot = 0;
-      let itemsHTML = "";
-      let itemsText = "品名        重量(kg)  单价(RM)  小计(RM)\n";
-      itemsText += "-----------------------------------------\n";
-
+      let itemsText = "----------------------------------------------\n";
+      itemsText += "Item        Weight(kg)  Price(RM)   Subtotal(RM)\n";
+      itemsText += "----------------------------------------------\n";
+    
       rows.forEach(r => {
         const product = r.fields["Product Name"] || "";
         const weight = parseFloat(r.fields["Weight"]) || 0;
         const price = parseFloat(r.fields["Unit Price"]) || 0;
         const subtotal = weight * price;
         tot += subtotal;
-        itemsHTML += `<tr><td>${product}</td><td>${weight.toFixed(2)} kg</td><td>RM ${price.toFixed(2)}</td><td>RM ${subtotal.toFixed(2)}</td></tr>`;
-        itemsText += `${product.padEnd(10)} ${weight.toFixed(2).padStart(6)}   ${price.toFixed(2).padStart(6)}   ${subtotal.toFixed(2).padStart(6)}\n`;
+    
+        itemsText += product.padEnd(12) +
+                     weight.toFixed(2).padStart(8) + "   " +
+                     price.toFixed(2).padStart(8) + "   " +
+                     subtotal.toFixed(2).padStart(10) + "\n";
       });
-
+    
+      itemsText += "----------------------------------------------\n";
+      itemsText += `Total : RM ${tot.toFixed(2)}\n\n*** Thank You ***`;
+    
+      // 检测设备
       const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
+    
       if (!isMobile) {
-        // 💻 电脑 → window.print()
+        // 💻 电脑直接打印
         const printContent = `
-          <div style="font-family:Arial,sans-serif;font-size:12pt;">
-            <div style="text-align:center;font-size:16pt;font-weight:bold;margin-bottom:10px">Sales Invoice</div>
-            <p><b>客户：</b>${cust}</p>
-            <p><b>编号：</b>${receiptNo}</p>
-            <p><b>时间：</b>${timeStr}</p>
-            <table style="width:100%;border-collapse:collapse;margin-top:10px" border="1">
-              <thead><tr><th>品名</th><th>重量</th><th>单价</th><th>小计</th></tr></thead>
-              <tbody>${itemsHTML}</tbody>
-              <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
-            </table>
-            <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
-          </div>
+          <pre style="font-family:Courier,monospace;font-size:12pt;">
+    Sales Invoice
+    
+    Customer : ${cust}
+    Invoice  : ${receiptNo}
+    Date     : ${timeStr}
+    
+    ${itemsText}
+          </pre>
         `;
+    
         const oldContent = document.body.innerHTML;
         document.body.innerHTML = printContent;
         window.print();
         document.body.innerHTML = oldContent;
         window.location.reload();
       } else {
-        // 📱 手机 → jsPDF 导出 PDF
+        // 📱 手机导出 PDF
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ unit: "mm", format: "a4" });
         doc.setFont("courier", "normal");
         doc.setFontSize(12);
-      
-        let content = `Sales Invoice\n\n客户: ${cust}\n编号: ${receiptNo}\n时间: ${timeStr}\n\n`;
-        content += itemsText;
-        content += "-----------------------------------------\n";
-        content += `总计: RM ${tot.toFixed(2)}\n\n❀ Thank You ❀`;
-      
+    
+        let content = `Sales Invoice\n\nCustomer : ${cust}\nInvoice  : ${receiptNo}\nDate     : ${timeStr}\n\n${itemsText}`;
         doc.text(content, 10, 10);
         doc.save("invoice-" + receiptNo + ".pdf");
       }
     }
+
 
     fetchAllReceipts().then(records => {
       allRecords = records;
