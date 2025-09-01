@@ -212,7 +212,7 @@
     function prevPage() { if (currentPage > 1) { currentPage--; renderTable(currentPage); } }
     function nextPage() { if (currentPage < Math.ceil(filteredRows.length / rowsPerPage)) { currentPage++; renderTable(currentPage); } }
 
-    // 🟡 新版打印 → 导出 PDF
+    // 🟡 打印函数：电脑用 window.print，手机用 jsPDF
     function printOne(receiptNo) {
       const rows = allRecords.filter(r => r.fields["Receipt Number"] === receiptNo);
       if (!rows.length) return alert("找不到该收据");
@@ -221,10 +221,9 @@
       const timeStr = new Date(rows[0].fields["Time Stamp"]).toLocaleString("zh-MY");
 
       let tot = 0;
-      let content = `Sales Invoice\n\n客户: ${cust}\n编号: ${receiptNo}\n时间: ${timeStr}\n\n商品:\n`;
-      content += "----------------------------------------------\n";
-      content += "品名     重量(kg)  单价(RM)  小计(RM)\n";
-      content += "----------------------------------------------\n";
+      let itemsHTML = "";
+      let itemsText = "品名        重量(kg)  单价(RM)  小计(RM)\n";
+      itemsText += "-----------------------------------------\n";
 
       rows.forEach(r => {
         const product = r.fields["Product Name"] || "";
@@ -232,18 +231,48 @@
         const price = parseFloat(r.fields["Unit Price"]) || 0;
         const subtotal = weight * price;
         tot += subtotal;
-        content += `${product.padEnd(6)} ${weight.toFixed(2).padStart(6)}  ${price.toFixed(2).padStart(7)}  ${subtotal.toFixed(2).padStart(8)}\n`;
+        itemsHTML += `<tr><td>${product}</td><td>${weight.toFixed(2)} kg</td><td>RM ${price.toFixed(2)}</td><td>RM ${subtotal.toFixed(2)}</td></tr>`;
+        itemsText += `${product.padEnd(10)} ${weight.toFixed(2).padStart(6)}   ${price.toFixed(2).padStart(6)}   ${subtotal.toFixed(2).padStart(6)}\n`;
       });
 
-      content += "----------------------------------------------\n";
-      content += `总计: RM ${tot.toFixed(2)}\n\n❀ Thank You ❀`;
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit: "mm", format: "a4" });
-      doc.setFont("courier", "normal");
-      doc.setFontSize(12);
-      doc.text(content, 10, 10);
-      doc.save(`invoice-${receiptNo}.pdf`);
+      if (!isMobile) {
+        // 💻 电脑 → window.print()
+        const printContent = `
+          <div style="font-family:Arial,sans-serif;font-size:12pt;">
+            <div style="text-align:center;font-size:16pt;font-weight:bold;margin-bottom:10px">Sales Invoice</div>
+            <p><b>客户：</b>${cust}</p>
+            <p><b>编号：</b>${receiptNo}</p>
+            <p><b>时间：</b>${timeStr}</p>
+            <table style="width:100%;border-collapse:collapse;margin-top:10px" border="1">
+              <thead><tr><th>品名</th><th>重量</th><th>单价</th><th>小计</th></tr></thead>
+              <tbody>${itemsHTML}</tbody>
+              <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
+            </table>
+            <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
+          </div>
+        `;
+        const oldContent = document.body.innerHTML;
+        document.body.innerHTML = printContent;
+        window.print();
+        document.body.innerHTML = oldContent;
+        window.location.reload();
+      } else {
+        // 📱 手机 → jsPDF 导出 PDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: "mm", format: "a4" });
+        doc.setFont("courier", "normal");
+        doc.setFontSize(12);
+
+        let content = `Sales Invoice\n\n客户: ${cust}\n编号: ${receiptNo}\n时间: ${timeStr}\n\n`;
+        content += itemsText;
+        content += "-----------------------------------------\n";
+        content += `总计: RM ${tot.toFixed(2)}\n\n❀ Thank You ❀`;
+
+        doc.text(content, 10, 10);
+        doc.save(\`invoice-\${receiptNo}.pdf\`);
+      }
     }
 
     fetchAllReceipts().then(records => {
