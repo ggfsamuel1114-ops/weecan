@@ -327,42 +327,53 @@
       });
     
       const htmlContent = `
-        <div style="font-family: Arial, sans-serif; font-size: 12pt;">
-          <div style="text-align:center; font-size: 16pt; font-weight: bold; margin-bottom: 10px;">Sales Invoice</div>
-          <p><b>客户：</b>${cust}</p>
-          <p><b>编号：</b>${receiptNo}</p>
-          <p><b>时间：</b>${timeStr}</p>
-          <table style="width:100%; border-collapse: collapse; margin-top: 10px;" border="1">
-            <thead>
-              <tr><th>果类</th><th>重量</th><th>单价</th><th>小计</th></tr>
-            </thead>
-            <tbody>${itemsHTML}</tbody>
-            <tfoot><tr><td colspan="3" style="text-align:center;"><b>总计</b></td><td><b>RM ${tot.toFixed(2)}</b></td></tr></tfoot>
-          </table>
-          <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
-        </div>
+        <html>
+          <head>
+            <meta charset="UTF-8"/>
+            <style>
+              body { font-family: Arial, sans-serif; font-size: 12pt; }
+              .header { text-align:center; font-size: 16pt; font-weight: bold; margin-bottom: 10px; }
+              table { width:100%; border-collapse: collapse; margin-top: 10px; }
+              th, td { border: 1px solid #000; padding: 6px; text-align: center; }
+              th { background: #f5f5f5; }
+              tfoot td { font-weight: bold; background: #f5f5f5; text-align: center; }
+            </style>
+          </head>
+          <body>
+            <div class="header">Sales Invoice</div>
+            <p><b>客户：</b>${cust}</p>
+            <p><b>编号：</b>${receiptNo}</p>
+            <p><b>时间：</b>${timeStr}</p>
+            <table>
+              <thead><tr><th>果类</th><th>重量</th><th>单价</th><th>小计</th></tr></thead>
+              <tbody>${itemsHTML}</tbody>
+              <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
+            </table>
+            <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
+          </body>
+        </html>
       `;
     
-      // 🟡 记录原始页面
-      const originalContent = document.body.innerHTML;
+      // 🟡 创建隐藏 iframe
+      const iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      document.body.appendChild(iframe);
     
-      // 显示 loading
-      showLoading();
+      const doc = iframe.contentWindow.document;
+      doc.open();
+      doc.write(htmlContent);
+      doc.close();
     
-      setTimeout(() => {
-        // 替换 body → 打印内容
-        document.body.innerHTML = htmlContent;
+      // 延迟一点，确保内容加载后再打印
+      iframe.onload = () => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
     
-        // 打印
-        window.print();
-    
-        // 打印结束 → 恢复原页面
-        document.body.innerHTML = originalContent;
-    
-        // 隐藏 loading
-        hideLoading();
-      }, 300);
+        // 打印后移除 iframe
+        setTimeout(() => document.body.removeChild(iframe), 500);
+      };
     }
+
 
     fetchAllReceipts().then(records => {
       allRecords = records;
