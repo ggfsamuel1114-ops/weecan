@@ -303,12 +303,14 @@
     
     // 🟡 打印：不新开窗口，直接替换 body → 打印 → 恢复
     function printOne(receiptNo) {
+      // 1. 找到该收据的所有记录
       const rows = allRecords.filter(r => r.fields["Receipt Number"] === receiptNo);
       if (!rows.length) return alert("找不到该收据");
     
       const cust = rows[0].fields["Customer Name"] || "N/A";
       const timeStr = new Date(rows[0].fields["Time Stamp"]).toLocaleString("zh-MY");
     
+      // 2. 拼装商品行
       let itemsHTML = "";
       let tot = 0;
       rows.forEach(r => {
@@ -319,48 +321,39 @@
         tot += subtotal;
         itemsHTML += `
           <tr>
-            <td style="text-align:left;">${product}</td>
-            <td style="text-align:center;">${weight.toFixed(2)} kg</td>
-            <td style="text-align:center;">RM ${price.toFixed(2)}</td>
-            <td style="text-align:center;">RM ${subtotal.toFixed(2)}</td>
+            <td>${product}</td>
+            <td>${weight.toFixed(2)} kg</td>
+            <td>RM ${price.toFixed(2)}</td>
+            <td>RM ${subtotal.toFixed(2)}</td>
           </tr>`;
       });
     
-      const htmlContent = `
-        <html>
-          <head>
-            <meta charset="UTF-8"/>
-            <title>Receipt</title>
-            <style>
-              body { font-family: Arial, sans-serif; font-size: 12pt; }
-              .header { text-align:center; font-size: 16pt; font-weight: bold; margin-bottom: 10px; }
-              table { width:100%; border-collapse: collapse; margin-top: 10px; }
-              th, td { border: 1px solid #000; padding: 6px; text-align: center; }
-              th { background: #f5f5f5; }
-              tfoot td { font-weight: bold; }
-            </style>
-          </head>
-          <body>
-            <div class="header">Sales Invoice</div>
-            <p><b>客户：</b>${cust}</p>
-            <p><b>编号：</b>${receiptNo}</p>
-            <p><b>时间：</b>${timeStr}</p>
-            <table>
-              <thead><tr><th>果类</th><th>重量</th><th>单价</th><th>小计</th></tr></thead>
-              <tbody>${itemsHTML}</tbody>
-              <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
-            </table>
-            <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
-          </body>
-        </html>
+      // 3. 要打印的 HTML
+      const printContent = `
+        <div style="font-family:Arial,sans-serif;font-size:12pt;">
+          <div style="text-align:center;font-size:16pt;font-weight:bold;margin-bottom:10px">Sales Invoice</div>
+          <p><b>客户：</b>${cust}</p>
+          <p><b>编号：</b>${receiptNo}</p>
+          <p><b>时间：</b>${timeStr}</p>
+          <table style="width:100%;border-collapse:collapse;margin-top:10px" border="1">
+            <thead><tr><th>果类</th><th>重量</th><th>单价</th><th>小计</th></tr></thead>
+            <tbody>${itemsHTML}</tbody>
+            <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
+          </table>
+          <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
+        </div>
       `;
     
-      // 🟡 用 Blob 生成一个临时 HTML 页面
-      const blob = new Blob([htmlContent], { type: "text/html" });
-      const url = URL.createObjectURL(blob);
+      // 4. 保存原页面，替换成收据内容
+      const oldContent = document.body.innerHTML;
+      document.body.innerHTML = printContent;
     
-      // 🟡 替换当前页面 → 打开收据
-      window.location.href = url;
+      // 5. 打印（此时就是在「当前页面」触发 → 手机可以打印）
+      window.print();
+    
+      // 6. 恢复原来的页面
+      document.body.innerHTML = oldContent;
+      window.location.reload();
     }
 
 
