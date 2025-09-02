@@ -255,6 +255,14 @@
     <button onclick="logout()">🚪 退出登录</button>
   </header>
 
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // 没有登录，直接跳转到 login.html
+      window.location.href = "index.html";
+    }
+  </script>
+
   <main>
     <!-- 左边输入区 -->
     <div class="section">
