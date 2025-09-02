@@ -55,6 +55,10 @@
     #submitButton:hover {background:#1e7c43;}
     /* 🔥 打印机优化样式（50mm 热敏纸） */
     @media print {
+      @page {
+        size: 58mm auto;   /* 热敏机纸张宽度 */
+        margin: 2mm;       /* 缩小边距 */
+      }
       body {
         width: 280px;
         font-size: 18px;
@@ -235,7 +239,7 @@ function showReceiptPage(cust, items){
   let itemsHTML=items.map(it=>{
     const s=it.weight*it.price;tot+=s;
     return `<tr>
-      <td>${it.product}<br>
+      <td>${it.product}</td>
       <td>${it.weight.toFixed(2)} kg</td>
       <td>RM ${s.toFixed(2)}</td>
     </tr>`;
