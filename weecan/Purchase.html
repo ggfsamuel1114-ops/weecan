@@ -5,142 +5,102 @@
   <title>Weecan Invoice</title>
   <style>
     :root {
-      --primary: #f1c40f;       /* 主黄 */
-      --primary-dark: #d4ac0d;  /* 深黄 */
-      --success: #27ae60;
-      --warning: #e67e22;
-      --info: #f39c12;          /* 橙黄代替 info */
-      --bg: #fdfaf3;            /* 背景浅米色 */
-      --card-bg: #ffffff;
-      --text-main: #2c3e50;
-      --text-muted: #7f8c8d;
-      --radius: 14px;
+      --primary:#f1c40f; --primary-dark:#d4ac0d;
+      --success:#27ae60; --warning:#e67e22; --info:#f39c12;
+      --bg:#fdfaf3; --card-bg:#ffffff; --text-main:#2c3e50;
+      --radius:14px;
     }
-    
-    body {
-      font-family: "Segoe UI", "Inter", sans-serif;
-      background: var(--bg);
-      margin: 0;
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    
-    header {
-      background: var(--card-bg);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-    header h1 { font-size: 20px; margin: 0; display: flex; align-items: center; gap: 8px; }
-    header button {
-      background: var(--primary);
-      border: none;
-      padding: 8px 16px;
-      color: white;
-      font-size: 14px;
-      border-radius: var(--radius);
-      cursor: pointer;
-    }
-    header button:hover { background: var(--primary-dark); }
-
-    main { flex: 1; display: flex; flex-direction: column; padding: 20px; gap: 20px; }
-    @media (min-width: 900px) { main { flex-direction: row; } }
-    .section {
-      flex: 1;
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-      padding: 24px;
-      overflow-y: auto;
-    }
-    .section h3, .section h4 { margin-top: 0; color: var(--text-main); }
-
-    .button-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
-    .product-button {
-      padding: 12px 18px; font-size: 15px; border: none; border-radius: var(--radius);
-      background: linear-gradient(135deg, var(--info), var(--primary-dark));
-      color: white; cursor: pointer;
-    }
-    .product-button:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
-
-    #customProductInput {
-      padding: 12px 18px; font-size: 15px; border: 2px dashed var(--primary);
-      border-radius: var(--radius); background: #fff; min-width: 140px; text-align: center;
-    }
-
-    input[type="text"], input[type="number"] {
-      padding: 10px; font-size: 15px; border: 1px solid #ccd;
-      border-radius: var(--radius); width: 100%; box-sizing: border-box;
-    }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
-    th { background: #fdf2c5; font-weight: 600; }
-
-    button {
-      border: none; border-radius: var(--radius); cursor: pointer;
-      padding: 10px 16px; font-size: 14px;
-    }
-    #submitButton { background: linear-gradient(135deg, var(--success), #219150); color: white; }
-
-    #toast {
-      visibility: hidden; min-width: 200px; background: var(--success); color: #fff;
-      text-align: center; border-radius: var(--radius); padding: 12px;
-      position: fixed; z-index: 1000; left: 50%; bottom: 30px;
-      transform: translateX(-50%); font-size: 16px;
-    }
-
-    #loadingOverlay {
-      position: fixed; inset: 0; background: rgba(255,255,255,0.8);
-      display: none; justify-content: center; align-items: center; z-index: 2000;
-    }
-    #loadingOverlay div {
-      background: var(--card-bg); padding: 20px 30px; border-radius: var(--radius);
-      font-size: 16px; display: flex; align-items: center; gap: 10px;
-    }
-    .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary);
-      border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    #popupInput {
-      position: absolute; background: #fff; border: 1px solid #ddd; border-radius: var(--radius);
-      padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: none; z-index: 500;
+    body{font-family:"Segoe UI","Inter",sans-serif;background:var(--bg);margin:0;color:var(--text-main);display:flex;flex-direction:column;height:100vh;}
+    header{background:var(--card-bg);box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;}
+    header h1{font-size:20px;margin:0;display:flex;align-items:center;gap:8px;}
+    header button{background:var(--primary);border:none;padding:8px 16px;color:white;font-size:14px;border-radius:var(--radius);cursor:pointer;}
+    header button:hover{background:var(--primary-dark);}
+    main{flex:1;display:flex;flex-direction:column;padding:20px;gap:20px;}
+    @media(min-width:900px){main{flex-direction:row;}}
+    .section{flex:1;background:var(--card-bg);border-radius:var(--radius);box-shadow:0 3px 12px rgba(0,0,0,0.06);padding:24px;overflow-y:auto;}
+    .button-group{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;}
+    .product-button{padding:12px 18px;font-size:15px;border:none;border-radius:var(--radius);background:linear-gradient(135deg,var(--info),var(--primary-dark));color:white;cursor:pointer;}
+    .product-button:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,0.12);}
+    #customProductInput{padding:12px 18px;font-size:15px;border:2px dashed var(--primary);border-radius:var(--radius);background:#fff;min-width:140px;text-align:center;}
+    input[type="text"],input[type="number"]{padding:10px;font-size:15px;border:1px solid #ccd;border-radius:var(--radius);width:100%;box-sizing:border-box;}
+    table{width:100%;border-collapse:collapse;margin-top:15px;}
+    th,td{border:1px solid #ddd;padding:10px;text-align:center;}
+    th{background:#fdf2c5;font-weight:600;}
+    #submitButton{background:linear-gradient(135deg,var(--success),#219150);color:white;}
+    #toast{visibility:hidden;min-width:200px;background:var(--success);color:#fff;text-align:center;border-radius:var(--radius);padding:12px;position:fixed;z-index:1000;left:50%;bottom:30px;transform:translateX(-50%);}
+    #loadingOverlay{position:fixed;inset:0;background:rgba(255,255,255,0.8);display:none;justify-content:center;align-items:center;z-index:2000;}
+    #loadingOverlay div{background:var(--card-bg);padding:20px 30px;border-radius:var(--radius);font-size:16px;display:flex;align-items:center;gap:10px;}
+    .spinner{border:4px solid #f3f3f3;border-top:4px solid var(--primary);border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;}
+    @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+    /* 居中弹窗 */
+    #popupInput{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid #ddd;border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,0.2);display:none;z-index:999;}
+    /* 打印优化 */
+    @media print {
+      header, 
+      .header-actions,
+      button {
+        display: none !important;
+      }
+      body {
+        background: white !important;
+      }
+      .section {
+        box-shadow: none !important;
+        border: none !important;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>🧾 Purchase </h1>
+    <h1>🧾 Purchase</h1>
     <div class="header-actions">
       <button id="backBtn">⬅️ Back</button>
       <button onclick="logout()">🚪 退出登录</button>
     </div>
   </header>
 
-  <script>
-    const token = localStorage.getItem("token");
-    if (!token) { window.location.href = "index.html"; }
-  </script>
-
   <main id="mainContent">
-    <!-- 默认显示采购页面 -->
+    <!-- 左边输入区 -->
     <div class="section">
       <h3>客户信息</h3>
       <input type="text" id="customerName" placeholder="客户名字 (必填)" />
+
       <h4>🍈 Musang</h4>
       <div class="button-group">
         <button class="product-button" data-name="Musang AM">AM</button>
         <button class="product-button" data-name="Musang ABM">ABM</button>
         <button class="product-button" data-name="Musang BM">BM</button>
+        <button class="product-button" data-name="Musang CM">CM</button>
+        <button class="product-button" data-name="Musang CCM">CCM</button>
+        <button class="product-button" data-name="Musang CCCM">CCCM</button>
+      </div>
+
+      <h4>🌑 Black Thorn</h4>
+      <div class="button-group">
+        <button class="product-button" data-name="BTA">BTA</button>
+        <button class="product-button" data-name="BTB">BTB</button>
+        <button class="product-button" data-name="BTC">BTC</button>
+        <button class="product-button" data-name="BTCC">BTCC</button>
+      </div>
+
+      <h4>🌕 D24</h4>
+      <div class="button-group">
+        <button class="product-button" data-name="D24A">D24A</button>
+        <button class="product-button" data-name="D24B">D24B</button>
+        <button class="product-button" data-name="D24C">D24C</button>
+      </div>
+
+      <h4>🍃 其他品种</h4>
+      <div class="button-group">
+        <button class="product-button" data-name="Kampung">Kampung</button>
+        <button class="product-button" data-name="KC">KC</button>
+        <button class="product-button" data-name="Kahwin">KW</button>
+        <input type="text" id="customProductInput" placeholder="输入自定义产品名称" />
       </div>
     </div>
+
+    <!-- 右边预览区 -->
     <div class="section">
       <h3>📋 Invoice Overview</h3>
       <table>
@@ -153,7 +113,8 @@
   </main>
 
   <!-- 弹出输入 -->
-  <div id="popupInput"><b id="popupProductName"></b><br/>
+  <div id="popupInput">
+    <b id="popupProductName"></b><br/>
     <input type="number" id="popupWeight" placeholder="重量(KG)" />
     <input type="number" id="popupPrice" placeholder="单价(RM)" />
     <button onclick="confirmPopup()">确定</button>
@@ -162,94 +123,70 @@
   <div id="toast"></div>
   <div id="loadingOverlay"><div><div class="spinner"></div><span id="loadingText">正在提交...</span></div></div>
 
-  <script>
-  const API_URL = "https://syve-dinvoice-system.vercel.app/api/token";
-  const items = [];
-  window.receiptNo = generateReceiptNo();
-  function generateReceiptNo() {
-    const now = new Date();
-    return `RCPT-${now.toISOString().slice(2,10).replace(/-/g,"")}-${Math.floor(1000+Math.random()*9000)}`;
-  }
+<script>
+const API_URL="https://syve-dinvoice-system.vercel.app/api/token";
+const items=[];
+window.receiptNo=generateReceiptNo();
+function generateReceiptNo(){const now=new Date();const ymd=now.toISOString().slice(2,10).replace(/-/g,"");const rand=Math.floor(1000+Math.random()*9000);return `RCPT-${ymd}-${rand}`;}
 
-  let currentProduct = null;
-  function selectProduct(name, btn) {
-    currentProduct = name;
-    document.getElementById('popupProductName').innerText = "🧺 " + name;
-    document.getElementById('popupInput').style.display = "block";
-  }
-  function confirmPopup() {
-    const w = parseFloat(document.getElementById('popupWeight').value);
-    const p = parseFloat(document.getElementById('popupPrice').value);
-    if(currentProduct && !isNaN(w) && !isNaN(p)) {
-      items.push({product:currentProduct, weight:w, price:p});
-      updateInvoice(); showToast("✅ 添加成功");
+let currentProduct=null;
+function selectProduct(name){currentProduct=name;document.getElementById('popupProductName').innerText="🧺 "+name;document.getElementById('popupInput').style.display="block";}
+function confirmPopup(){const w=parseFloat(document.getElementById('popupWeight').value);const p=parseFloat(document.getElementById('popupPrice').value);if(currentProduct&&!isNaN(w)&&!isNaN(p)){items.push({product:currentProduct,weight:w,price:p});updateInvoice();showToast("✅ 添加成功");}else{alert("请填写重量和单价！");return;}document.getElementById('popupWeight').value="";document.getElementById('popupPrice').value="";document.getElementById('popupInput').style.display="none";}
+function updateInvoice(){const tbody=document.getElementById('invoiceItems');tbody.innerHTML='';let total=0;items.forEach((it,i)=>{const sub=it.weight*it.price;total+=sub;tbody.insertAdjacentHTML('beforeend',`<tr><td>${it.product}</td><td><input type="number" value="${it.weight}" onchange="editItem(${i},'weight',this.value)"></td><td><input type="number" value="${it.price.toFixed(2)}" onchange="editItem(${i},'price',this.value)"></td><td>${sub.toFixed(2)}</td><td><button onclick="deleteItem(${i})">❌ 删除</button></td></tr>`);});document.getElementById('totalAmount').innerText=total.toFixed(2);document.getElementById('submitButton').style.display=items.length?'inline-block':'none';}
+function deleteItem(i){if(confirm('确定删除?')){items.splice(i,1);updateInvoice();}}
+function editItem(i,f,v){const n=parseFloat(v);if(!isNaN(n)){items[i][f]=n;updateInvoice();}}
+function showToast(msg){const t=document.getElementById("toast");t.innerText=msg;t.style.visibility="visible";setTimeout(()=>t.style.visibility="hidden",2000);}
+function showLoading(msg="..."){document.getElementById("loadingText").innerText=msg;document.getElementById("loadingOverlay").style.display="flex";}
+function hideLoading(){document.getElementById("loadingOverlay").style.display="none";}
+
+// ✅ 收据预览
+function showReceiptPage(cust, items){
+  const now=new Date();const timeStr=now.toLocaleString('zh-MY');const no=window.receiptNo;
+  let itemsHTML='',tot=0;
+  items.forEach(it=>{const s=it.weight*it.price;tot+=s;itemsHTML+=`<tr><td>${it.product}</td><td>${it.weight.toFixed(2)}</td><td>RM ${it.price.toFixed(2)}</td><td>RM ${s.toFixed(2)}</td></tr>`;});
+  document.getElementById("mainContent").innerHTML=`
+    <div class="section">
+      <div class="header">Purchase Receipt</div>
+      <p><b>客户：</b>${cust}</p>
+      <p><b>编号：</b>${no}</p>
+      <p><b>时间：</b>${timeStr}</p>
+      <table>
+        <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
+        <tbody>${itemsHTML}</tbody>
+        <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
+      </table>
+      <div style="text-align:center;margin-top:20px;">❀ Thank You ❀</div>
+      <div style="text-align:center;margin-top:20px;">
+        <button onclick="window.print()">🖨 打印</button>
+        <button onclick="window.location.reload()">⬅ 返回</button>
+      </div>
+    </div>`;
+}
+
+let isSubmitting=false;
+async function submitToAirtable(){
+  if(isSubmitting)return;isSubmitting=true;document.getElementById('submitButton').disabled=true;
+  const cust=document.getElementById('customerName').value.trim();
+  if(!cust||!items.length){alert('请填写客户名字并至少添加一项');isSubmitting=false;document.getElementById('submitButton').disabled=false;return;}
+  showLoading("正在提交...");
+  try{
+    for(const it of items){
+      const payload={fields:{"Receipt Number":window.receiptNo,"Customer Name":cust,"Product Name":it.product,"Unit Price":it.price,"Weight":it.weight,"Total Price":it.weight*it.price}};
+      const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      if(!res.ok){alert("❌ 提交失败");hideLoading();return;}
     }
-    document.getElementById('popupWeight').value="";
-    document.getElementById('popupPrice').value="";
-    document.getElementById('popupInput').style.display="none";
-  }
-  function updateInvoice() {
-    const tbody = document.getElementById('invoiceItems'); tbody.innerHTML='';
-    let total=0;
-    items.forEach((it,i)=>{
-      const sub=it.weight*it.price; total+=sub;
-      tbody.insertAdjacentHTML('beforeend',`<tr><td>${it.product}</td><td>${it.weight}</td><td>${it.price}</td><td>${sub.toFixed(2)}</td><td><button onclick="deleteItem(${i})">❌</button></td></tr>`);
-    });
-    document.getElementById('totalAmount').innerText = total.toFixed(2);
-    document.getElementById('submitButton').style.display = items.length?'inline-block':'none';
-  }
-  function deleteItem(i){ items.splice(i,1); updateInvoice(); }
-  function showToast(msg){const t=document.getElementById("toast");t.innerText=msg;t.style.visibility="visible";setTimeout(()=>t.style.visibility="hidden",2000);}
-  function showLoading(msg="..."){document.getElementById("loadingText").innerText=msg;document.getElementById("loadingOverlay").style.display="flex";}
-  function hideLoading(){document.getElementById("loadingOverlay").style.display="none";}
+    hideLoading();
+    showReceiptPage(cust,items);
+  }catch(e){alert("异常:"+e.message);hideLoading();}
+  finally{isSubmitting=false;document.getElementById('submitButton').disabled=false;}
+}
 
-  // ✅ 收据预览页
-  function showReceiptPage(cust, items) {
-    const now = new Date(); const timeStr = now.toLocaleString('zh-MY'); const no = window.receiptNo;
-    let itemsHTML='',tot=0;
-    items.forEach(it=>{const s=it.weight*it.price;tot+=s;itemsHTML+=`<tr><td>${it.product}</td><td>${it.weight.toFixed(2)}</td><td>RM ${it.price.toFixed(2)}</td><td>RM ${s.toFixed(2)}</td></tr>`;});
-    document.getElementById("mainContent").innerHTML=`
-      <div class="section">
-        <div class="header">Purchase Receipt</div>
-        <p><b>客户：</b>${cust}</p>
-        <p><b>编号：</b>${no}</p>
-        <p><b>时间：</b>${timeStr}</p>
-        <table>
-          <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
-          <tbody>${itemsHTML}</tbody>
-          <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
-        </table>
-        <div style="text-align:center;margin-top:20px;">❀ Thank You ❀</div>
-        <div style="text-align:center;margin-top:20px;">
-          <button onclick="window.print()">🖨 打印</button>
-          <button onclick="window.location.reload()">⬅ 返回</button>
-        </div>
-      </div>`;
-  }
-
-  let isSubmitting=false;
-  async function submitToAirtable(){
-    if(isSubmitting) return; isSubmitting=true; document.getElementById('submitButton').disabled=true;
-    const cust=document.getElementById('customerName').value.trim();
-    if(!cust||!items.length){alert("请填写客户名字并至少添加一项");isSubmitting=false;document.getElementById('submitButton').disabled=false;return;}
-    showLoading("正在提交...");
-    try{
-      for(const it of items){
-        const payload={fields:{"Receipt Number":window.receiptNo,"Customer Name":cust,"Product Name":it.product,"Unit Price":it.price,"Weight":it.weight,"Total Price":it.weight*it.price}};
-        const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-        if(!res.ok){alert("❌ 提交失败");hideLoading();return;}
-      }
-      hideLoading();
-      showReceiptPage(cust, items);
-    }catch(e){alert("异常:"+e.message);hideLoading();}
-    finally{isSubmitting=false;document.getElementById('submitButton').disabled=false;}
-  }
-
-  window.addEventListener('DOMContentLoaded',()=>{
-    document.querySelectorAll('.product-button').forEach(b=>b.addEventListener('click',()=>selectProduct(b.dataset.name,b)));
-    document.getElementById('submitButton').addEventListener('click',submitToAirtable);
-    document.getElementById('backBtn').addEventListener('click',()=>window.location.href='main.html');
-  });
-  </script>
+window.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.product-button').forEach(b=>b.addEventListener('click',()=>selectProduct(b.dataset.name)));
+  document.getElementById('submitButton').addEventListener('click',submitToAirtable);
+  document.getElementById('backBtn').addEventListener('click',()=>window.location.href='main.html');
+  document.getElementById('customProductInput').addEventListener('input',e=>{const v=e.target.value.trim();if(v){selectProduct(v);}});
+});
+</script>
 </body>
 </html>
