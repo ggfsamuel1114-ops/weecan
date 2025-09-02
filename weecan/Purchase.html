@@ -55,16 +55,23 @@
     #submitButton:hover {background:#1e7c43;}
     /* 打印优化 */
     @media print {
-      header, #submitButton, .no-print, #toast, #loadingOverlay {display:none!important;}
-      body,html,main,.section {
-        display:block!important;
-        height:auto!important;
-        margin:0!important;
-        padding:0!important;
-        background:#fff!important;
-        box-shadow:none!important;
-      }
+    header, #submitButton, .no-print, #toast, #loadingOverlay {display:none!important;}
+    header,.header-actions,button {display:none !important;}
+    body,html {
+      height:auto !important;min-height:auto !important;margin:0 !important;padding:0 !important;
+      display:block !important;background:white !important;
+      font-size:18px !important;   /* ✅ 全局字体放大 */
+      line-height:1.6 !important;
     }
+    main,.section {
+      display:block !important;height:auto !important;min-height:auto !important;
+      padding:0 !important;box-shadow:none !important;border:none !important;
+    }
+    table th, table td {
+      font-size:25px !important;   /* ✅ 表格文字放大 */
+      padding:15px !important;
+    }
+  }
   </style>
 </head>
 <body>
@@ -223,7 +230,7 @@ function showReceiptPage(cust, items){
         <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
       </table>
       <div style="text-align:center;margin-top:20px;">❀ Thank You ❀</div>
-      <div style="text-align:center;margin-top:20px;">
+      <div style="text-align:center;margin-top:20px;" class="no-print">
         <button onclick="window.print()">🖨 打印</button>
         <button onclick="window.location.reload()">⬅ 返回</button>
       </div>
