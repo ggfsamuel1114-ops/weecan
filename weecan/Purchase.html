@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-MY">
 <head>
@@ -5,18 +6,18 @@
   <title>Weecan Invoice</title>
   <style>
     :root {
-      --primary: #3498db;
-      --primary-dark: #2c80b4;
+      --primary: #f1c40f;       /* 主黄 */
+      --primary-dark: #d4ac0d;  /* 深黄 */
       --success: #27ae60;
       --warning: #e67e22;
-      --info: #2980b9;
-      --bg: #f4f6f9;
+      --info: #f39c12;          /* 橙黄代替 info */
+      --bg: #fdfaf3;            /* 背景浅米色 */
       --card-bg: #ffffff;
       --text-main: #2c3e50;
       --text-muted: #7f8c8d;
       --radius: 14px;
     }
-
+    
     body {
       font-family: "Segoe UI", "Inter", sans-serif;
       background: var(--bg);
@@ -26,7 +27,7 @@
       flex-direction: column;
       height: 100vh;
     }
-
+    
     /* 顶部导航条 */
     header {
       background: var(--card-bg);
@@ -59,7 +60,7 @@
     header button:hover {
       background: var(--primary-dark);
     }
-
+    
     /* 主容器 */
     main {
       flex: 1;
@@ -71,7 +72,7 @@
     @media (min-width: 900px) {
       main { flex-direction: row; }
     }
-
+    
     .section {
       flex: 1;
       background: var(--card-bg);
@@ -84,7 +85,7 @@
       margin-top: 0;
       color: var(--text-main);
     }
-
+    
     /* 产品按钮组 */
     .button-group {
       display: flex;
@@ -97,7 +98,7 @@
       font-size: 15px;
       border: none;
       border-radius: var(--radius);
-      background: linear-gradient(135deg, var(--info), #1f6693);
+      background: linear-gradient(135deg, var(--info), var(--primary-dark));
       color: white;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.3s;
@@ -110,7 +111,7 @@
       background: linear-gradient(135deg, var(--success), #219150) !important;
       border: 2px solid #49a97f;
     }
-
+    
     /* 自定义产品输入 */
     #customProductInput {
       padding: 12px 18px;
@@ -125,9 +126,9 @@
     #customProductInput:focus {
       outline: none;
       border-color: var(--primary-dark);
-      background: #e6f3ff;
+      background: #fff9e6; /* 浅黄 */
     }
-
+    
     /* 输入框 */
     input[type="text"], input[type="number"] {
       padding: 10px;
@@ -137,7 +138,7 @@
       width: 100%;
       box-sizing: border-box;
     }
-
+    
     /* 表格 */
     table {
       width: 100%;
@@ -150,10 +151,10 @@
       text-align: center;
     }
     th {
-      background: #f5f5f5;
+      background: #fdf2c5; /* 浅黄表头 */
       font-weight: 600;
     }
-
+    
     /* 按钮通用 */
     button {
       border: none;
@@ -175,7 +176,7 @@
       background: linear-gradient(135deg, var(--success), #219150);
       color: white;
     }
-
+    
     /* Toast */
     #toast {
       visibility: hidden;
@@ -192,7 +193,7 @@
       transform: translateX(-50%);
       font-size: 16px;
     }
-
+    
     /* Loading 遮罩 */
     #loadingOverlay {
       position: fixed;
@@ -226,7 +227,7 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
+    
     /* 弹出输入面板 */
     #popupInput {
       position: absolute;
@@ -251,7 +252,7 @@
 </head>
 <body>
   <header>
-    <h1>🧾 Weecan Invoice</h1>
+    <h1>🧾 Purchase </h1>
     <button onclick="logout()">🚪 退出登录</button>
   </header>
 
