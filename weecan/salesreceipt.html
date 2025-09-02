@@ -213,25 +213,24 @@
     function prevPage() { if (currentPage > 1) { currentPage--; renderTable(currentPage); } }
     function nextPage() { if (currentPage < Math.ceil(filteredRows.length / rowsPerPage)) { currentPage++; renderTable(currentPage); } }
 
-    // 🟡 优化版打印函数
+    // 🟡 改良版打印函数（预览 + 返回按钮）
     function printOne(receiptNo) {
       const rows = allRecords.filter(r => r.fields["Receipt Number"] === receiptNo);
       if (!rows.length) return alert("Invoice not found");
-
+    
       const cust = rows[0].fields["Customer Name"] || "N/A";
       const timeStr = new Date(rows[0].fields["Time Stamp"]).toLocaleString("en-GB");
-
+    
       let tot = 0;
       let itemsHTML = "";
-      let tableData = [];
-
+    
       rows.forEach(r => {
         const product = r.fields["Product Name"] || "";
         const weight = parseFloat(r.fields["Weight"]) || 0;
         const price = parseFloat(r.fields["Unit Price"]) || 0;
         const subtotal = weight * price;
         tot += subtotal;
-
+    
         itemsHTML += `
           <tr>
             <td>${product}</td>
@@ -239,88 +238,53 @@
             <td>RM ${price.toFixed(2)}</td>
             <td>RM ${subtotal.toFixed(2)}</td>
           </tr>`;
-
-        tableData.push([product, weight.toFixed(2), price.toFixed(2), subtotal.toFixed(2)]);
       });
-
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-      if (!isMobile) {
-        // 💻 电脑 → 新窗口打印
-        const printWin = window.open("", "_blank");
-        printWin.document.write(`
-          <html>
-            <head>
-              <meta charset="UTF-8"/>
-              <title>Invoice ${receiptNo}</title>
-              <style>
-                body { font-family: Arial, sans-serif; font-size: 12pt; padding:20px; }
-                .header { text-align:center; font-size: 18pt; font-weight: bold; margin-bottom: 10px; }
-                table { width:100%; border-collapse: collapse; margin-top: 10px; }
-                th, td { border: 1px solid #000; padding: 6px; text-align: center; }
-                th { background: #f5f5f5; }
-                tfoot td { font-weight: bold; background: #f5f5f5; }
-              </style>
-            </head>
-            <body>
-              <div class="header">Sales Invoice</div>
-              <p><b>Customer:</b> ${cust}</p>
-              <p><b>Invoice:</b> ${receiptNo}</p>
-              <p><b>Date:</b> ${timeStr}</p>
-              <table>
-                <thead>
-                  <tr><th>Item</th><th>Weight (kg)</th><th>Price (RM)</th><th>Subtotal (RM)</th></tr>
-                </thead>
-                <tbody>${itemsHTML}</tbody>
-                <tfoot>
-                  <tr><td colspan="3">Total</td><td>RM ${tot.toFixed(2)}</td></tr>
-                </tfoot>
-              </table>
-              <div style="text-align:center;margin-top:15px">❀ Thank You ❀</div>
-              <script>
-                window.onload = function() {
-                  window.print();
-                  setTimeout(() => {
-                    alert("✅ 打印完成！");
-                    window.close();
-                  }, 500);
-                }
-              <\/script>
-            </body>
-          </html>
-        `);
-        printWin.document.close();
-
-      } else {
-        // 📱 手机 → PDF
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ unit: "mm", format: "a4" });
-
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(16);
-        doc.text("Sales Invoice", 105, 20, { align: "center" });
-
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Customer: ${cust}`, 20, 35);
-        doc.text(`Invoice : ${receiptNo}`, 20, 42);
-        doc.text(`Date    : ${timeStr}`, 20, 49);
-
-        doc.autoTable({
-          startY: 60,
-          head: [["Item", "Weight (kg)", "Price (RM)", "Subtotal (RM)"]],
-          body: tableData,
-          theme: "grid",
-          styles: { halign: "center" },
-          headStyles: { fillColor: [41, 128, 185] },
-          foot: [["", "", "Total", tot.toFixed(2)]],
-          footStyles: { fillColor: [200, 200, 200], halign: "center" }
-        });
-
-        doc.save("invoice-" + receiptNo + ".pdf");
-        alert("✅ PDF 已保存！");
-      }
+    
+      // 新开一个预览窗口（手机 + 电脑统一逻辑）
+      const win = window.open("", "_blank");
+      win.document.write(`
+        <html>
+          <head>
+            <meta charset="UTF-8"/>
+            <title>Invoice ${receiptNo}</title>
+            <style>
+              body { font-family: Arial, sans-serif; font-size: 12pt; padding:20px; }
+              .header { text-align:center; font-size: 18pt; font-weight: bold; margin-bottom: 10px; }
+              table { width:100%; border-collapse: collapse; margin-top: 10px; }
+              th, td { border: 1px solid #000; padding: 6px; text-align: center; }
+              th { background: #f5f5f5; }
+              tfoot td { font-weight: bold; background: #f5f5f5; }
+              .btn { margin: 10px; padding: 8px 16px; border:none; border-radius:6px; background:#3498db; color:#fff; cursor:pointer; }
+              .btn:hover { background:#2c80b4; }
+            </style>
+          </head>
+          <body>
+            <div class="header">Sales Invoice</div>
+            <p><b>Customer:</b> ${cust}</p>
+            <p><b>Invoice:</b> ${receiptNo}</p>
+            <p><b>Date:</b> ${timeStr}</p>
+            <table>
+              <thead>
+                <tr><th>Item</th><th>Weight (kg)</th><th>Price (RM)</th><th>Subtotal (RM)</th></tr>
+              </thead>
+              <tbody>${itemsHTML}</tbody>
+              <tfoot>
+                <tr><td colspan="3">Total</td><td>RM ${tot.toFixed(2)}</td></tr>
+              </tfoot>
+            </table>
+            <div style="text-align:center;margin-top:15px">❀ Thank You ❀</div>
+    
+            <!-- 按钮区域 -->
+            <div style="text-align:center; margin-top:30px;">
+              <button class="btn" onclick="window.print()">🖨 打印 / 存 PDF</button>
+              <button class="btn" onclick="window.close()">⬅ 返回</button>
+            </div>
+          </body>
+        </html>
+      `);
+      win.document.close();
     }
+
 
     // 初始化数据
     fetchAllReceipts().then(records => {
