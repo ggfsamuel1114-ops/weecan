@@ -28,7 +28,7 @@
     th{background:#fdf2c5;font-weight:600;}
     #toast{visibility:hidden;min-width:200px;background:var(--success);color:#fff;text-align:center;border-radius:var(--radius);padding:12px;position:fixed;z-index:1000;left:50%;bottom:30px;transform:translateX(-50%);}
     #loadingOverlay{position:fixed;inset:0;background:rgba(255,255,255,0.8);display:none;justify-content:center;align-items:center;z-index:2000;}
-    #loadingOverlay div{background:var(--card-bg);padding:20px 30px;border-radius:var(--radius);font-size:16px;display:flex;align-items:center;gap:10px;}
+    #loadingOverlay div{background:var(--card-bg);padding:20px 30px;border-radius:var(--radius);font-size:20px;display:flex;align-items:center;gap:10px;}
     .spinner{border:4px solid #f3f3f3;border-top:4px solid var(--primary);border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;}
     @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
     /* 弹窗 */
@@ -53,27 +53,24 @@
       border-radius: var(--radius);cursor: pointer;
     }
     #submitButton:hover {background:#1e7c43;}
+    /* 打印优化 */
     /* 🔥 打印机优化样式（50mm 热敏纸） */
     @media print {
-      @page {
-        size: 58mm auto;   /* 热敏机纸张宽度 */
-        margin: 2mm;       /* 缩小边距 */
-      }
       body {
-        width: 280px;
-        font-size: 18px;
+        width: 280px;        /* 限制打印宽度 */
+        font-size: 16px;     /* 放大字体 */
         line-height: 1.4;
       }
       header, .header-actions, #submitButton, #popupInput, #loadingOverlay {
-        display: none !important;
+        display: none !important; /* 不打印按钮和交互UI */
       }
       table {
         width: 100%;
-        font-size: 18px;
+        font-size: 16px;
         border-collapse: collapse;
       }
       th, td {
-        border: none;
+        border: none;        /* 去掉复杂边框 */
         text-align: left;
         padding: 4px 0;
       }
@@ -85,12 +82,14 @@
         border-top: 1px dashed #000;
         font-weight: bold;
       }
+      /* 居中标题/页脚 */
       .header, .footer {
         text-align: center;
         font-weight: bold;
-        margin: 6px 0;
+        margin: 8px 0;
       }
     }
+
   </style>
 </head>
 <body>
@@ -173,7 +172,7 @@ function generateReceiptNo(){
   const now=new Date();
   const ymd=now.toISOString().slice(2,10).replace(/-/g,"");
   const rand=Math.floor(1000+Math.random()*9000);
-  return `RCPT-${ymd}-${rand}`;
+  return RCPT-${ymd}-${rand};
 }
 
 let currentProduct=null;
@@ -232,31 +231,24 @@ document.addEventListener('click',(e)=>{
   }
 });
 
-// ✅ 收据预览（热敏打印优化）
+// ✅ 收据预览
 function showReceiptPage(cust, items){
   const now=new Date();const timeStr=now.toLocaleString('zh-MY');const no=window.receiptNo;
-  let tot=0;
-  let itemsHTML=items.map(it=>{
-    const s=it.weight*it.price;tot+=s;
-    return `<tr>
-      <td>${it.product}</td>
-      <td>${it.weight.toFixed(2)} kg</td>
-      <td>RM ${s.toFixed(2)}</td>
-    </tr>`;
-  }).join('');
+  let itemsHTML='',tot=0;
+  items.forEach(it=>{const s=it.weight*it.price;tot+=s;itemsHTML+=<tr><td>${it.product}</td><td>${it.weight.toFixed(2)}</td><td>RM ${it.price.toFixed(2)}</td><td>RM ${s.toFixed(2)}</td></tr>;});
   document.getElementById("mainContent").innerHTML=`
     <div class="section">
-      <div class="header" style="font-size:20px;">Weecan Invoice</div>
+      <div class="header">Purchase Receipt</div>
       <p><b>客户：</b>${cust}</p>
       <p><b>编号：</b>${no}</p>
       <p><b>时间：</b>${timeStr}</p>
       <table>
-        <thead><tr><th>产品</th><th>重量</th><th>小计</th></tr></thead>
+        <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
         <tbody>${itemsHTML}</tbody>
-        <tfoot><tr><td colspan="2">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
+        <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
       </table>
-      <div style="text-align:center;margin-top:10px;">❀ Thank You ❀</div>
-      <div style="text-align:center;margin-top:10px;">
+      <div style="text-align:center;margin-top:20px;">❀ Thank You ❀</div>
+      <div style="text-align:center;margin-top:20px;">
         <button onclick="window.print()">🖨 打印</button>
         <button onclick="window.location.reload()">⬅ 返回</button>
       </div>
