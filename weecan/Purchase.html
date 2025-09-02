@@ -165,6 +165,10 @@
   </style>
 </head>
 <body>
+
+  <div style="text-align:right; margin:10px;">
+      <button onclick="logout()">🚪 退出登录</button>
+  </div>
   <div class="input-area">
     <h3>🧾 Name</h3>
     <input type="text" id="customerName" placeholder="客户名字 (必填)" />
@@ -243,6 +247,8 @@
       <span id="loadingText">正在提交，请稍候...</span>
     </div>
   </div>
+
+  <script src="auth.js"></script>
 
   <script>
   const API_URL = "https://syve-dinvoice-system.vercel.app/api/token";
