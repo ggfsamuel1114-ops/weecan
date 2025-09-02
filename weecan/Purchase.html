@@ -56,12 +56,31 @@
       cursor: pointer;
     }
     #submitButton:hover {background:#1e7c43;}
-    /* 打印优化 */
+    /* 打印优化（方案一） */
     @media print {
       header,.header-actions,button {display:none !important;}
-      body,html {height:auto !important;margin:0 !important;padding:0 !important;background:white !important;}
-      main {display:block !important;padding:0 !important;}
-      .section {display:block !important;height:auto !important;min-height:auto !important;box-shadow:none !important;border:none !important;padding:0 !important;}
+      body,html {
+        height:auto !important;
+        min-height:auto !important;
+        margin:0 !important;
+        padding:0 !important;
+        display:block !important;
+        background:white !important;
+      }
+      main {
+        display:block !important;
+        height:auto !important;
+        min-height:auto !important;
+        padding:0 !important;
+      }
+      .section {
+        display:block !important;
+        height:auto !important;
+        min-height:auto !important;
+        box-shadow:none !important;
+        border:none !important;
+        padding:0 !important;
+      }
     }
   </style>
 </head>
@@ -160,7 +179,6 @@ function confirmPopup(){
     items.push({product:currentProduct,weight:w,price:p});
     updateInvoice();
     showToast("✅ 添加成功");
-    // 清空自定义输入框
     document.getElementById('customProductInput').value="";
   }else{alert("请填写重量和单价！");return;}
   document.getElementById('popupWeight').value="";
