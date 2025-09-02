@@ -54,17 +54,23 @@
     }
     #submitButton:hover {background:#1e7c43;}
     /* 打印优化 */
-    @media print {
-      header,.header-actions,button {display:none !important;}
-      body,html {
-        height:auto !important;min-height:auto !important;margin:0 !important;padding:0 !important;
-        display:block !important;background:white !important;
-      }
-      main,.section {
-        display:block !important;height:auto !important;min-height:auto !important;
-        padding:0 !important;box-shadow:none !important;border:none !important;
-      }
+      @media print {
+    header,.header-actions,button {display:none !important;}
+    body,html {
+      height:auto !important;min-height:auto !important;margin:0 !important;padding:0 !important;
+      display:block !important;background:white !important;
+      font-size:18px !important;   /* ✅ 全局字体放大 */
+      line-height:1.6 !important;
     }
+    main,.section {
+      display:block !important;height:auto !important;min-height:auto !important;
+      padding:0 !important;box-shadow:none !important;border:none !important;
+    }
+    table th, table td {
+      font-size:18px !important;   /* ✅ 表格文字放大 */
+      padding:12px !important;
+    }
+  }
   </style>
 </head>
 <body>
