@@ -168,10 +168,6 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 10px rgba(0,0,0,0.12);
     }
-    #backBtn {
-      background: linear-gradient(135deg, var(--warning), #cf6717);
-      color: white;
-    }
     #submitButton {
       background: linear-gradient(135deg, var(--success), #219150);
       color: white;
@@ -253,8 +249,12 @@
 <body>
   <header>
     <h1>🧾 Purchase </h1>
-    <button onclick="logout()">🚪 退出登录</button>
+    <div class="header-actions">
+      <button id="backBtn">⬅️ Back</button>
+      <button onclick="logout()">🚪 退出登录</button>
+    </div>
   </header>
+
 
   <script>
     const token = localStorage.getItem("token");
@@ -302,10 +302,7 @@
         <button class="product-button" data-name="Kahwin">KW</button>
         <input type="text" id="customProductInput" placeholder="输入自定义产品名称" />
       </div>
-
-      <div style="margin-top:15px; display:flex; justify-content:flex-end; gap:15px;">
-        <button type="button" id="backBtn">⬅️ Back</button>
-      </div>
+ 
     </div>
 
     <!-- 右边预览区 -->
