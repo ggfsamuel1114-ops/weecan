@@ -407,7 +407,7 @@
       if (!rows.length) return alert("Invoice not found");
     
       const cust = rows[0].fields["Customer Name"] || "N/A";
-      const timeStr = new Date(rows[0].fields["Time Stamp"]).toLocaleString("en-GB");
+      const timeStr = new Date(rows[0].fields["Time Stamp"]).toLocaleString("zh-MY");
     
       let tot = 0;
       let itemsHTML = "";
@@ -435,14 +435,53 @@
             <meta charset="UTF-8"/>
             <title>Invoice ${receiptNo}</title>
             <style>
-              body { font-family: Arial, sans-serif; font-size: 12pt; padding:20px; }
-              .header { text-align:center; font-size: 18pt; font-weight: bold; margin-bottom: 10px; }
-              table { width:100%; border-collapse: collapse; margin-top: 10px; }
-              th, td { border: 1px solid #000; padding: 6px; text-align: center; }
-              th { background: #f5f5f5; }
-              tfoot td { font-weight: bold; background: #f5f5f5; }
-              .btn { margin: 10px; padding: 8px 16px; border:none; border-radius:6px; background:#3498db; color:#fff; cursor:pointer; }
-              .btn:hover { background:#2c80b4; }
+              body {
+                font-family: Arial, sans-serif;
+                font-size: 12pt;
+                padding: 20px;
+                color: #2c3e50;
+              }
+              .header {
+                text-align: center;
+                font-size: 18pt;
+                font-weight: bold;
+                margin-bottom: 15px;
+              }
+              p {
+                margin: 4px 0;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+              }
+              th, td {
+                border: 1px solid #000;
+                padding: 6px;
+                text-align: center;
+              }
+              th {
+                background: #f5f5f5;
+                font-weight: 600;
+              }
+              tfoot td {
+                font-weight: bold;
+                background: #f9f9f9;
+              }
+              .footer {
+                text-align: center;
+                margin-top: 20px;
+              }
+              .btn {
+                margin: 10px;
+                padding: 8px 16px;
+                border: none;
+                border-radius: 6px;
+                background: #3498db;
+                color: #fff;
+                cursor: pointer;
+              }
+              .btn:hover { background: #2c80b4; }
               /* 打印时隐藏按钮 */
               @media print {
                 .no-print { display: none !important; }
@@ -450,23 +489,31 @@
             </style>
           </head>
           <body>
-            <div class="header">Sales Invoice</div>
-            <p><b>Customer:</b> ${cust}</p>
-            <p><b>Invoice:</b> ${receiptNo}</p>
-            <p><b>Date:</b> ${timeStr}</p>
+            <div class="header">Purchase Invoice</div>
+            <p><b>客户:</b> ${cust}</p>
+            <p><b>收据编号:</b> ${receiptNo}</p>
+            <p><b>时间:</b> ${timeStr}</p>
             <table>
               <thead>
-                <tr><th>Item</th><th>Weight (kg)</th><th>Price (RM)</th><th>Subtotal (RM)</th></tr>
+                <tr>
+                  <th>产品</th>
+                  <th>重量 (kg)</th>
+                  <th>单价 (RM)</th>
+                  <th>小计 (RM)</th>
+                </tr>
               </thead>
-              <tbody>${itemsHTML}</tbody>
+              <tbody>
+                ${itemsHTML}
+              </tbody>
               <tfoot>
-                <tr><td colspan="3">Total</td><td>RM ${tot.toFixed(2)}</td></tr>
+                <tr>
+                  <td colspan="3">总计</td>
+                  <td>RM ${tot.toFixed(2)}</td>
+                </tr>
               </tfoot>
             </table>
-            <div style="text-align:center;margin-top:15px">❀ Thank You ❀</div>
-    
-            <!-- 按钮区域（打印时隐藏） -->
-            <div class="no-print" style="text-align:center; margin-top:30px;">
+            <div class="footer">❀ Thank You ❀</div>
+            <div class="no-print" style="text-align:center; margin-top:20px;">
               <button class="btn" onclick="window.print()">🖨 打印 / 存 PDF</button>
               <button class="btn" onclick="window.close()">⬅ 返回</button>
             </div>
@@ -475,6 +522,7 @@
       `);
       win.document.close();
     }
+
     // 初始化数据
     fetchAllReceipts().then(records => {
       allRecords = records;
