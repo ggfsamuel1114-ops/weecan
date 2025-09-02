@@ -32,54 +32,37 @@
     .spinner{border:4px solid #f3f3f3;border-top:4px solid var(--primary);border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;}
     @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
     /* 弹窗 */
-    #popupInput{position:absolute;background:#fff;border:1px solid #ddd;border-radius:var(--radius);padding:12px;box-shadow:0 4px 10px rgba(0,0,0,0.15);display:none;z-index:999;min-width:200px;}
+    #popupInput{
+      position:absolute;background:#fff;border:1px solid #ddd;border-radius:var(--radius);
+      padding:16px;box-shadow:0 4px 10px rgba(0,0,0,0.15);display:none;z-index:999;min-width:220px;
+    }
+    #popupInput b{display:block;margin-bottom:14px;font-weight:600;}
+    #popupInput input{
+      display:block;width:100%;margin:12px 0;padding:10px;
+      border:1px solid #ccc;border-radius:var(--radius);font-size:15px;box-sizing:border-box;
+    }
     #popupInput button {
-      background: var(--primary);
-      border: none;
-      padding: 10px;
-      color: white;
-      font-size: 15px;
-      border-radius: var(--radius);
-      cursor: pointer;
-      margin-top: 10px;
-      width: 100%;
+      background: var(--primary);border: none;padding: 12px;color: white;
+      font-size: 15px;border-radius: var(--radius);cursor: pointer;margin-top: 12px;width: 100%;
     }
     #popupInput button:hover {background: var(--primary-dark);}
     /* Submit 按钮统一风格 */
     #submitButton {
       background: linear-gradient(135deg,var(--success),#219150);
-      border: none;
-      padding: 10px 16px;
-      color: white;
-      font-size: 15px;
-      border-radius: var(--radius);
-      cursor: pointer;
+      border: none;padding: 10px 16px;color: white;font-size: 15px;
+      border-radius: var(--radius);cursor: pointer;
     }
     #submitButton:hover {background:#1e7c43;}
-    /* 打印优化（方案一） */
+    /* 打印优化 */
     @media print {
       header,.header-actions,button {display:none !important;}
       body,html {
-        height:auto !important;
-        min-height:auto !important;
-        margin:0 !important;
-        padding:0 !important;
-        display:block !important;
-        background:white !important;
+        height:auto !important;min-height:auto !important;margin:0 !important;padding:0 !important;
+        display:block !important;background:white !important;
       }
-      main {
-        display:block !important;
-        height:auto !important;
-        min-height:auto !important;
-        padding:0 !important;
-      }
-      .section {
-        display:block !important;
-        height:auto !important;
-        min-height:auto !important;
-        box-shadow:none !important;
-        border:none !important;
-        padding:0 !important;
+      main,.section {
+        display:block !important;height:auto !important;min-height:auto !important;
+        padding:0 !important;box-shadow:none !important;border:none !important;
       }
     }
   </style>
@@ -147,7 +130,7 @@
 
   <!-- 弹出输入 -->
   <div id="popupInput">
-    <b id="popupProductName"></b><br/>
+    <b id="popupProductName"></b>
     <input type="number" id="popupWeight" placeholder="重量(KG)" />
     <input type="number" id="popupPrice" placeholder="单价(RM)" />
     <button onclick="confirmPopup()">确定</button>
@@ -160,7 +143,12 @@
 const API_URL="https://syve-dinvoice-system.vercel.app/api/token";
 const items=[];
 window.receiptNo=generateReceiptNo();
-function generateReceiptNo(){const now=new Date();const ymd=now.toISOString().slice(2,10).replace(/-/g,"");const rand=Math.floor(1000+Math.random()*9000);return `RCPT-${ymd}-${rand}`;}
+function generateReceiptNo(){
+  const now=new Date();
+  const ymd=now.toISOString().slice(2,10).replace(/-/g,"");
+  const rand=Math.floor(1000+Math.random()*9000);
+  return `RCPT-${ymd}-${rand}`;
+}
 
 let currentProduct=null;
 function selectProduct(name,btn){
@@ -206,6 +194,17 @@ function editItem(i,f,v){const n=parseFloat(v);if(!isNaN(n)){items[i][f]=n;updat
 function showToast(msg){const t=document.getElementById("toast");t.innerText=msg;t.style.visibility="visible";setTimeout(()=>t.style.visibility="hidden",2000);}
 function showLoading(msg="..."){document.getElementById("loadingText").innerText=msg;document.getElementById("loadingOverlay").style.display="flex";}
 function hideLoading(){document.getElementById("loadingOverlay").style.display="none";}
+
+// ✅ 点击空白处关闭 popup
+document.addEventListener('click',(e)=>{
+  const popup=document.getElementById('popupInput');
+  const custom=document.getElementById('customProductInput');
+  if(popup.style.display==="block" && !popup.contains(e.target) && !e.target.classList.contains('product-button') && e.target!==custom){
+    popup.style.display="none";
+    document.getElementById('popupWeight').value="";
+    document.getElementById('popupPrice').value="";
+  }
+});
 
 // ✅ 收据预览
 function showReceiptPage(cust, items){
