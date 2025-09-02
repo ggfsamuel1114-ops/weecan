@@ -10,7 +10,7 @@
       --bg:#fdfaf3; --card-bg:#ffffff; --text-main:#2c3e50;
       --radius:14px;
     }
-    body{font-family:"Segoe UI","Inter",sans-serif;background:var(--bg);margin:0;color:var(--text-main);display:flex;flex-direction:column;height:100vh;}
+    body{font-family:"Segoe UI","Inter",sans-serif;background:var(--bg);margin:0;color:var(--text-main);display:flex;flex-direction:column;min-height:100vh;}
     header{background:var(--card-bg);box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;}
     header h1{font-size:20px;margin:0;display:flex;align-items:center;gap:8px;}
     header button{background:var(--primary);border:none;padding:8px 16px;color:white;font-size:14px;border-radius:var(--radius);cursor:pointer;}
@@ -32,22 +32,25 @@
     #loadingOverlay div{background:var(--card-bg);padding:20px 30px;border-radius:var(--radius);font-size:16px;display:flex;align-items:center;gap:10px;}
     .spinner{border:4px solid #f3f3f3;border-top:4px solid var(--primary);border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;}
     @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-    /* 🔹 跟随按钮位置弹窗（还原原始逻辑） */
-    #popupInput{position:absolute;background:#fff;border:1px solid #ddd;border-radius:var(--radius);padding:12px;box-shadow:0 4px 10px rgba(0,0,0,0.15);display:none;z-index:999;}
+    /* 弹窗 */
+    #popupInput{position:absolute;background:#fff;border:1px solid #ddd;border-radius:var(--radius);padding:12px;box-shadow:0 4px 10px rgba(0,0,0,0.15);display:none;z-index:999;min-width:200px;}
+    #popupInput button {
+      background: var(--primary);
+      border: none;
+      padding: 10px;
+      color: white;
+      font-size: 15px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+    }
+    #popupInput button:hover {background: var(--primary-dark);}
     /* 打印优化 */
     @media print {
-      header, 
-      .header-actions,
-      button {
-        display: none !important;
-      }
-      body {
-        background: white !important;
-      }
-      .section {
-        box-shadow: none !important;
-        border: none !important;
-      }
+      header,.header-actions,button {display:none !important;}
+      body,html {height:auto !important;margin:0 !important;padding:0 !important;background:white !important;}
+      main,.section {height:auto !important;min-height:auto !important;box-shadow:none !important;border:none !important;}
     }
   </style>
 </head>
@@ -146,6 +149,8 @@ function confirmPopup(){
     items.push({product:currentProduct,weight:w,price:p});
     updateInvoice();
     showToast("✅ 添加成功");
+    // 清空自定义输入框
+    document.getElementById('customProductInput').value="";
   }else{alert("请填写重量和单价！");return;}
   document.getElementById('popupWeight').value="";
   document.getElementById('popupPrice').value="";
