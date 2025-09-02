@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -287,43 +288,67 @@
     const now = new Date();
     const timeStr = now.toLocaleString('zh-MY');
     const no = window.receiptNo || "N/A";
+  
     let itemsHTML = '';
     let tot = 0;
+  
     items.forEach(it => {
-      const s = it.weight * it.price; tot += s;
-      itemsHTML += `<tr><td>${it.product}</td><td>${it.weight.toFixed(2)}</td><td>RM ${it.price.toFixed(2)}</td><td>RM ${s.toFixed(2)}</td></tr>`;
+      const s = it.weight * it.price;
+      tot += s;
+      itemsHTML += `
+        <tr>
+          <td>${it.product}</td>
+          <td>${it.weight.toFixed(2)}</td>
+          <td>RM ${it.price.toFixed(2)}</td>
+          <td>RM ${s.toFixed(2)}</td>
+        </tr>`;
     });
+  
+    const win = window.open("", "_blank");
+    win.document.write(`
+      <html>
+        <head>
+          <meta charset="UTF-8"/>
+          <title>Receipt ${no}</title>
+          <style>
+            body { font-family: Arial, sans-serif; font-size: 12pt; padding:20px; }
+            .header { text-align:center; font-size: 18pt; font-weight: bold; margin-bottom: 10px; }
+            table { width:100%; border-collapse: collapse; margin-top: 10px; }
+            th, td { border: 1px solid #000; padding: 6px; text-align: center; }
+            th { background: #f5f5f5; }
+            tfoot td { font-weight: bold; background: #f5f5f5; }
+            .btn { margin: 10px; padding: 8px 16px; border:none; border-radius:6px; background:#3498db; color:#fff; cursor:pointer; }
+            .btn:hover { background:#2c80b4; }
+            /* 打印时隐藏按钮 */
+            @media print {
+              .no-print { display: none !important; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">Sales Receipt</div>
+          <p><b>客户：</b>${cust}</p>
+          <p><b>编号：</b>${no}</p>
+          <p><b>时间：</b>${timeStr}</p>
+          <table>
+            <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
+            <tbody>${itemsHTML}</tbody>
+            <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
+          </table>
+          <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
+  
+          <!-- 底部按钮 (不会被打印) -->
+          <div class="no-print" style="text-align:center; margin-top:30px;">
+            <button class="btn" onclick="window.print()">🖨 打印 / 存 PDF</button>
+            <button class="btn" onclick="window.opener.location.href='main.html'; window.close();">⬅ 返回</button>
 
-    const htmlContent = `
-      <html><head><meta charset="UTF-8"/>
-      <style>
-        body { font-family: Arial, sans-serif; font-size: 12pt; }
-        .header { text-align:center; font-size: 18pt; font-weight: bold; margin-bottom: 12px; }
-        table { width:100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #000; padding: 6px; text-align: center; }
-        tfoot td { font-weight: bold; background: #f5f5f5; }
-      </style></head>
-      <body>
-        <div class="header">Sales Invoice</div>
-        <p><b>客户：</b>${cust}</p>
-        <p><b>编号：</b>${no}</p>
-        <p><b>时间：</b>${timeStr}</p>
-        <table>
-          <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
-          <tbody>${itemsHTML}</tbody>
-          <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
-        </table>
-        <div style="text-align:center;margin-top:10px">❀ Thank You ❀</div>
-      </body></html>`;
-
-    const iframe = document.createElement("iframe");
-    iframe.style.position = "absolute"; iframe.style.left = "-9999px";
-    document.body.appendChild(iframe);
-    const doc = iframe.contentWindow.document;
-    doc.open(); doc.write(htmlContent); doc.close();
-    iframe.contentWindow.focus(); iframe.contentWindow.print();
-    setTimeout(() => document.body.removeChild(iframe), 1000);
+          </div>
+        </body>
+      </html>
+    `);
+    win.document.close();
   }
+
 
   let isSubmitting = false;
   async function submitToAirtable() {
@@ -368,9 +393,8 @@
           return;
         }
       }
-      document.getElementById("loadingText").innerText = "✅ 提交成功，正在打印...";
+      document.getElementById("loadingText").innerText = "✅ 提交成功，请在弹出的窗口中操作打印";
       printReceipt();
-      setTimeout(() => window.location.href = 'main.html', 3000);
     } catch (error) {
       hideLoading();
       alert(`🚨 提交异常: ${error.message}`);
