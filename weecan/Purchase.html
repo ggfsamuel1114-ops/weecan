@@ -1,82 +1,189 @@
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="zh-MY">
 <head>
   <meta charset="UTF-8" />
   <title>Weecan Invoice</title>
   <style>
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2c80b4;
+      --success: #27ae60;
+      --warning: #e67e22;
+      --info: #2980b9;
+      --bg: #f4f6f9;
+      --card-bg: #ffffff;
+      --text-main: #2c3e50;
+      --text-muted: #7f8c8d;
+      --radius: 14px;
+    }
+
     body {
-      font-family: "Segoe UI", sans-serif;
-      background: #fdf8f3;
+      font-family: "Segoe UI", "Inter", sans-serif;
+      background: var(--bg);
       margin: 0;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* 顶部导航条 */
+    header {
+      background: var(--card-bg);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    header h1 {
+      font-size: 20px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    header button {
+      background: var(--primary);
+      border: none;
+      padding: 8px 16px;
+      color: white;
+      font-size: 14px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    header button:hover {
+      background: var(--primary-dark);
+    }
+
+    /* 主容器 */
+    main {
+      flex: 1;
       display: flex;
       flex-direction: column;
       padding: 20px;
+      gap: 20px;
     }
-    @media (min-width: 700px) {
-      body { flex-direction: row; }
+    @media (min-width: 900px) {
+      main { flex-direction: row; }
     }
-    .input-area, .preview-area {
+
+    .section {
       flex: 1;
-      padding: 20px;
-      border-radius: 12px;
-      margin: 10px;
-      background: #fff8f0;
-      box-shadow: 0 0 10px rgba(200,150,100,0.1);
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+      padding: 24px;
+      overflow-y: auto;
     }
-    h3, h4 { color: #5e4638; }
-    .button-group button, button {
+    .section h3, .section h4 {
+      margin-top: 0;
+      color: var(--text-main);
+    }
+
+    /* 产品按钮组 */
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .product-button {
       padding: 12px 18px;
-      margin: 5px;
-      font-size: 16px;
-      background: #d2e5f3;
-      color: #333;
+      font-size: 15px;
       border: none;
-      border-radius: 12px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--info), #1f6693);
+      color: white;
       cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.3s;
     }
-    .button-group button:hover, button:hover {
-      background: #bdd9eb;
+    .product-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.12);
     }
     .product-button.active {
-      background: #a5e6be !important;
+      background: linear-gradient(135deg, var(--success), #219150) !important;
       border: 2px solid #49a97f;
     }
-    input {
-      padding: 12px;
-      font-size: 16px;
-      margin: 5px 0;
-      border: 1px solid #aaccee;
-      border-radius: 10px;
-      background: #ffffff;
-    }
-    .invoice-box input[type="number"] {
-      width: 80px;
-      padding: 6px 8px;
-      font-size: 15px;
-      border: 1px solid #aaccee;
-      border-radius: 8px;
-      text-align: right;
-      background: #f9fcff;
-      box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-    }
-    .invoice-box td { vertical-align: middle; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th { background: #f3e4d7; color: #5e4638; }
-    th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
 
-    /* Toast 样式 */
+    /* 自定义产品输入 */
+    #customProductInput {
+      padding: 12px 18px;
+      font-size: 15px;
+      border: 2px dashed var(--primary);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--text-main);
+      min-width: 140px;
+      text-align: center;
+    }
+    #customProductInput:focus {
+      outline: none;
+      border-color: var(--primary-dark);
+      background: #e6f3ff;
+    }
+
+    /* 输入框 */
+    input[type="text"], input[type="number"] {
+      padding: 10px;
+      font-size: 15px;
+      border: 1px solid #ccd;
+      border-radius: var(--radius);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* 表格 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #f5f5f5;
+      font-weight: 600;
+    }
+
+    /* 按钮通用 */
+    button {
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      padding: 10px 16px;
+      font-size: 14px;
+      transition: transform 0.15s, box-shadow 0.3s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    }
+    #backBtn {
+      background: linear-gradient(135deg, var(--warning), #cf6717);
+      color: white;
+    }
+    #submitButton {
+      background: linear-gradient(135deg, var(--success), #219150);
+      color: white;
+    }
+
+    /* Toast */
     #toast {
       visibility: hidden;
       min-width: 200px;
-      background: #4caf50;
+      background: var(--success);
       color: #fff;
       text-align: center;
-      border-radius: 8px;
+      border-radius: var(--radius);
       padding: 12px;
       position: fixed;
       z-index: 1000;
@@ -89,26 +196,27 @@
     /* Loading 遮罩 */
     #loadingOverlay {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.4);
+      inset: 0;
+      background: rgba(255,255,255,0.8);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 2000;
+      backdrop-filter: blur(3px);
     }
     #loadingOverlay div {
-      background: white;
+      background: var(--card-bg);
       padding: 20px 30px;
-      border-radius: 10px;
+      border-radius: var(--radius);
       font-size: 16px;
       display: flex;
       align-items: center;
       gap: 10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
     }
     .spinner {
       border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
+      border-top: 4px solid var(--primary);
       border-radius: 50%;
       width: 20px;
       height: 20px;
@@ -122,9 +230,9 @@
     /* 弹出输入面板 */
     #popupInput {
       position: absolute;
-      background: #fffbe8;
-      border: 1px solid #d4b06a;
-      border-radius: 10px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: var(--radius);
       padding: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
       display: none;
@@ -133,99 +241,81 @@
     #popupInput h5 {
       margin: 4px 0;
       font-size: 14px;
-      color: #5e4638;
+      color: var(--text-main);
     }
     #popupInput input {
       width: 100px;
       margin-bottom: 6px;
-      padding: 6px;
-      font-size: 14px;
-    }
-    
-    #customProductInput {
-      display: inline-block;
-      padding: 12px 18px;
-      margin: 5px;
-      font-size: 16px;
-      border: 2px dashed #7cc6ff;
-      border-radius: 12px;
-      background: #ffffff;
-      color: #1a3d66;
-      min-width: 140px;
-      box-sizing: border-box;
-      text-align: center;   /* 🔑 输入内容居中 */
-    }
-    
-    /* 点击时高亮 */
-    #customProductInput:focus {
-      outline: none;
-      border-color: #2980b9;
-      background: #e6f3ff;
     }
   </style>
 </head>
 <body>
+  <header>
+    <h1>🧾 Weecan Invoice</h1>
+    <button onclick="logout()">🚪 退出登录</button>
+  </header>
 
-  <div style="text-align:right; margin:10px;">
-      <button onclick="logout()">🚪 退出登录</button>
-  </div>
-  <div class="input-area">
-    <h3>🧾 Name</h3>
-    <input type="text" id="customerName" placeholder="客户名字 (必填)" />
+  <main>
+    <!-- 左边输入区 -->
+    <div class="section">
+      <h3>客户信息</h3>
+      <input type="text" id="customerName" placeholder="客户名字 (必填)" />
 
-    <h4>🍈 Musang</h4>
-    <div class="button-group">
-      <button class="product-button" data-name="Musang AM">AM</button>
-      <button class="product-button" data-name="Musang ABM">ABM</button>
-      <button class="product-button" data-name="Musang BM">BM</button>
-      <button class="product-button" data-name="Musang CM">CM</button>
-      <button class="product-button" data-name="Musang CCM">CCM</button>
-      <button class="product-button" data-name="Musang CCCM">CCCM</button>
+      <h4>🍈 Musang</h4>
+      <div class="button-group">
+        <button class="product-button" data-name="Musang AM">AM</button>
+        <button class="product-button" data-name="Musang ABM">ABM</button>
+        <button class="product-button" data-name="Musang BM">BM</button>
+        <button class="product-button" data-name="Musang CM">CM</button>
+        <button class="product-button" data-name="Musang CCM">CCM</button>
+        <button class="product-button" data-name="Musang CCCM">CCCM</button>
+      </div>
+
+      <h4>🌑 Black Thorn</h4>
+      <div class="button-group">
+        <button class="product-button" data-name="BTA">BTA</button>
+        <button class="product-button" data-name="BTB">BTB</button>
+        <button class="product-button" data-name="BTC">BTC</button>
+        <button class="product-button" data-name="BTCC">BTCC</button>
+      </div>
+
+      <h4>🌕 D24</h4>
+      <div class="button-group">
+        <button class="product-button" data-name="D24A">D24A</button>
+        <button class="product-button" data-name="D24B">D24B</button>
+        <button class="product-button" data-name="D24C">D24C</button>
+      </div>
+
+      <h4>🍃 其他品种</h4>
+      <div class="button-group">
+        <button class="product-button" data-name="Kampung">Kampung</button>
+        <button class="product-button" data-name="KC">KC</button>
+        <button class="product-button" data-name="Kahwin">KW</button>
+        <input type="text" id="customProductInput" placeholder="输入自定义产品名称" />
+      </div>
+
+      <div style="margin-top:15px; display:flex; justify-content:flex-end; gap:15px;">
+        <button type="button" id="backBtn">⬅️ Back</button>
+      </div>
     </div>
 
-    <h4>🌑 Black Thorn</h4>
-    <div class="button-group">
-      <button class="product-button" data-name="BTA">BTA</button>
-      <button class="product-button" data-name="BTB">BTB</button>
-      <button class="product-button" data-name="BTC">BTC</button>
-      <button class="product-button" data-name="BTCC">BTCC</button>
+    <!-- 右边预览区 -->
+    <div class="section">
+      <h3>📋 Invoice Overview</h3>
+      <div class="invoice-box">
+        <table>
+          <thead>
+            <tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th><th>操作</th></tr>
+          </thead>
+          <tbody id="invoiceItems"></tbody>
+        </table>
+        <p><strong>总计：</strong>RM <span id="totalAmount">0.00</span></p>
+      </div>
+      <div style="margin-top:15px;text-align:right;">
+        <button type="button" id="submitButton" style="display:none;">📤 提交到 Airtable</button>
+      </div>
     </div>
-
-    <h4>🌕 D24</h4>
-    <div class="button-group">
-      <button class="product-button" data-name="D24A">D24A</button>
-      <button class="product-button" data-name="D24B">D24B</button>
-      <button class="product-button" data-name="D24C">D24C</button>
-    </div>
-
-    <h4>🍃 其他品种</h4>
-    <div class="button-group">
-      <button class="product-button" data-name="Kampung">Kampung</button>
-      <button class="product-button" data-name="KC">KC</button>
-      <button class="product-button" data-name="Kahwin">KW</button>
-      <input type="text" id="customProductInput" placeholder="输入自定义产品名称" />
-    </div>
-    
-    <div style="margin-top:15px; display:flex; justify-content:flex-end; gap:15px;">
-      <button type="button" id="backBtn">⬅️ Back</button>
-    </div>
-  </div>
-
-  <div class="preview-area">
-    <h3>📋 Invoice Overview</h3>
-    <div class="invoice-box">
-      <table>
-        <thead>
-          <tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th><th>操作</th></tr>
-        </thead>
-        <tbody id="invoiceItems"></tbody>
-      </table>
-      <p><strong>总计：</strong>RM <span id="totalAmount">0.00</span></p>
-    </div>
-    <div style="margin-top:15px;text-align:right;">
-      <button type="button" id="submitButton" style="display:none;">📤 提交到 Airtable</button>
-    </div>
-  </div>
+  </main>
 
   <!-- 弹出输入面板 -->
   <div id="popupInput">
@@ -237,7 +327,7 @@
     <button type="button" onclick="confirmPopup()">确定</button>
   </div>
 
-  <!-- Toast 容器 -->
+  <!-- Toast -->
   <div id="toast"></div>
 
   <!-- Loading 遮罩 -->
