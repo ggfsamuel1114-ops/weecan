@@ -32,8 +32,8 @@
     #loadingOverlay div{background:var(--card-bg);padding:20px 30px;border-radius:var(--radius);font-size:16px;display:flex;align-items:center;gap:10px;}
     .spinner{border:4px solid #f3f3f3;border-top:4px solid var(--primary);border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;}
     @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-    /* 居中弹窗 */
-    #popupInput{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid #ddd;border-radius:var(--radius);padding:16px;box-shadow:0 4px 12px rgba(0,0,0,0.2);display:none;z-index:999;}
+    /* 🔹 跟随按钮位置弹窗（还原原始逻辑） */
+    #popupInput{position:absolute;background:#fff;border:1px solid #ddd;border-radius:var(--radius);padding:12px;box-shadow:0 4px 10px rgba(0,0,0,0.15);display:none;z-index:999;}
     /* 打印优化 */
     @media print {
       header, 
@@ -130,9 +130,43 @@ window.receiptNo=generateReceiptNo();
 function generateReceiptNo(){const now=new Date();const ymd=now.toISOString().slice(2,10).replace(/-/g,"");const rand=Math.floor(1000+Math.random()*9000);return `RCPT-${ymd}-${rand}`;}
 
 let currentProduct=null;
-function selectProduct(name){currentProduct=name;document.getElementById('popupProductName').innerText="🧺 "+name;document.getElementById('popupInput').style.display="block";}
-function confirmPopup(){const w=parseFloat(document.getElementById('popupWeight').value);const p=parseFloat(document.getElementById('popupPrice').value);if(currentProduct&&!isNaN(w)&&!isNaN(p)){items.push({product:currentProduct,weight:w,price:p});updateInvoice();showToast("✅ 添加成功");}else{alert("请填写重量和单价！");return;}document.getElementById('popupWeight').value="";document.getElementById('popupPrice').value="";document.getElementById('popupInput').style.display="none";}
-function updateInvoice(){const tbody=document.getElementById('invoiceItems');tbody.innerHTML='';let total=0;items.forEach((it,i)=>{const sub=it.weight*it.price;total+=sub;tbody.insertAdjacentHTML('beforeend',`<tr><td>${it.product}</td><td><input type="number" value="${it.weight}" onchange="editItem(${i},'weight',this.value)"></td><td><input type="number" value="${it.price.toFixed(2)}" onchange="editItem(${i},'price',this.value)"></td><td>${sub.toFixed(2)}</td><td><button onclick="deleteItem(${i})">❌ 删除</button></td></tr>`);});document.getElementById('totalAmount').innerText=total.toFixed(2);document.getElementById('submitButton').style.display=items.length?'inline-block':'none';}
+function selectProduct(name,btn){
+  currentProduct=name;
+  document.getElementById('popupProductName').innerText="🧺 "+name;
+  const rect=btn.getBoundingClientRect();
+  const popup=document.getElementById('popupInput');
+  popup.style.top=(window.scrollY+rect.bottom+8)+"px";
+  popup.style.left=(window.scrollX+rect.left)+"px";
+  popup.style.display="block";
+}
+function confirmPopup(){
+  const w=parseFloat(document.getElementById('popupWeight').value);
+  const p=parseFloat(document.getElementById('popupPrice').value);
+  if(currentProduct&&!isNaN(w)&&!isNaN(p)){
+    items.push({product:currentProduct,weight:w,price:p});
+    updateInvoice();
+    showToast("✅ 添加成功");
+  }else{alert("请填写重量和单价！");return;}
+  document.getElementById('popupWeight').value="";
+  document.getElementById('popupPrice').value="";
+  document.getElementById('popupInput').style.display="none";
+}
+function updateInvoice(){
+  const tbody=document.getElementById('invoiceItems');tbody.innerHTML='';
+  let total=0;
+  items.forEach((it,i)=>{
+    const sub=it.weight*it.price;total+=sub;
+    tbody.insertAdjacentHTML('beforeend',
+      `<tr><td>${it.product}</td>
+      <td><input type="number" value="${it.weight}" onchange="editItem(${i},'weight',this.value)"></td>
+      <td><input type="number" value="${it.price.toFixed(2)}" onchange="editItem(${i},'price',this.value)"></td>
+      <td>${sub.toFixed(2)}</td>
+      <td><button onclick="deleteItem(${i})">❌ 删除</button></td></tr>`
+    );
+  });
+  document.getElementById('totalAmount').innerText=total.toFixed(2);
+  document.getElementById('submitButton').style.display=items.length?'inline-block':'none';
+}
 function deleteItem(i){if(confirm('确定删除?')){items.splice(i,1);updateInvoice();}}
 function editItem(i,f,v){const n=parseFloat(v);if(!isNaN(n)){items[i][f]=n;updateInvoice();}}
 function showToast(msg){const t=document.getElementById("toast");t.innerText=msg;t.style.visibility="visible";setTimeout(()=>t.style.visibility="hidden",2000);}
@@ -182,10 +216,10 @@ async function submitToAirtable(){
 }
 
 window.addEventListener('DOMContentLoaded',()=>{
-  document.querySelectorAll('.product-button').forEach(b=>b.addEventListener('click',()=>selectProduct(b.dataset.name)));
+  document.querySelectorAll('.product-button').forEach(b=>b.addEventListener('click',()=>selectProduct(b.dataset.name,b)));
   document.getElementById('submitButton').addEventListener('click',submitToAirtable);
   document.getElementById('backBtn').addEventListener('click',()=>window.location.href='main.html');
-  document.getElementById('customProductInput').addEventListener('input',e=>{const v=e.target.value.trim();if(v){selectProduct(v);}});
+  document.getElementById('customProductInput').addEventListener('input',e=>{const v=e.target.value.trim();if(v){selectProduct(v,e.target);}});
 });
 </script>
 </body>
