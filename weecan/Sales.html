@@ -5,94 +5,135 @@
   <title>Weecan Invoice</title>
   <style>
     :root {
-      --primary: #3498db;
-      --primary-dark: #2c80b4;
-      --success: #27ae60;
-      --info: #2980b9;
-      --bg: #f4f6f9;
-      --card-bg: #ffffff;
-      --text-main: #2c3e50;
-      --radius: 14px;
+      --primary:#3498db;
+      --primary-dark:#2c80b4;
+      --success:#27ae60;
+      --info:#2980b9;
+      --bg:#f4f6f9;
+      --card-bg:#fff;
+      --text-main:#2c3e50;
+      --radius:14px;
     }
 
     body {
-      font-family: "Segoe UI","Inter",sans-serif;
-      background: var(--bg);
-      margin: 0;
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+      font-family:"Segoe UI","Inter",sans-serif;
+      margin:0;
+      background:var(--bg);
+      color:var(--text-main);
+      display:flex;
+      flex-direction:column;
+      height:100vh;
     }
 
     header {
-      background: var(--card-bg);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      background:var(--card-bg);
+      box-shadow:0 2px 8px rgba(0,0,0,.08);
+      padding:12px 24px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
     }
-    header h1 { font-size: 20px; margin: 0; display: flex; align-items: center; gap: 8px; }
-    header button { background: var(--primary); border: none; padding: 8px 16px; color: #fff; border-radius: var(--radius); cursor: pointer; }
-    header button:hover { background: var(--primary-dark); }
+    header h1 {font-size:20px;margin:0;display:flex;align-items:center;gap:8px;}
+    header button {
+      background:var(--primary);
+      color:#fff;
+      border:none;
+      padding:8px 16px;
+      border-radius:var(--radius);
+      cursor:pointer;
+    }
+    header button:hover{background:var(--primary-dark);}
 
-    main { flex:1; display:flex; flex-direction:column; padding:20px; gap:20px; }
-    @media(min-width:900px){ main{flex-direction:row;} }
+    main {flex:1;display:flex;flex-direction:column;padding:20px;gap:20px;}
+    @media(min-width:900px){main{flex-direction:row;}}
 
-    .section { flex:1; background:var(--card-bg); border-radius:var(--radius); box-shadow:0 3px 12px rgba(0,0,0,0.06); padding:24px; overflow-y:auto; }
-    .section h3,.section h4 { margin-top:0; }
+    .section {
+      flex:1;
+      background:var(--card-bg);
+      border-radius:var(--radius);
+      padding:24px;
+      box-shadow:0 3px 12px rgba(0,0,0,.06);
+    }
+    #customerName {
+      width: 60%;
+      padding: 10px;
+      font-size: 15px;
+      border: 1px solid #ccd;
+      border-radius: var(--radius);
+      margin-bottom: 15px;
+    }
 
-    .button-group { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px; }
+    .button-group {display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;}
     .product-button {
-      padding:12px 18px; font-size:15px; border:none; border-radius:var(--radius);
-      background:linear-gradient(135deg,var(--info),#1f6693); color:white; cursor:pointer;
+      padding:10px 16px;
+      font-size:14px;
+      border:none;
+      border-radius:var(--radius);
+      cursor:pointer;
+      background:linear-gradient(135deg,var(--info),#1f6693);
+      color:#fff;
     }
-    .product-button:hover { transform:translateY(-2px); box-shadow:0 6px 14px rgba(0,0,0,0.12); }
+    .product-button:hover {transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,.12);}
+    .btn {
+      background:linear-gradient(135deg,var(--success),#219150);
+      color:#fff;
+      border:none;
+      padding:10px 16px;
+      border-radius:var(--radius);
+      cursor:pointer;
+      font-size:14px;
+    }
+    .btn.long{display:block;width:100%;margin-top:10px;}
 
     #customProductInput {
-      padding:12px 18px; font-size:15px; border:2px dashed var(--primary);
-      border-radius:var(--radius); background:#fff; min-width:140px; text-align:center;
-    }
-
-    table { width:100%; border-collapse:collapse; margin-top:15px; }
-    th,td { border:1px solid #ddd; padding:10px; text-align:center; }
-    th { background:#f5f5f5; }
-
-    /* 通用按钮 */
-    .btn {
-      background: linear-gradient(135deg, var(--success), #219150);
-      color: white;
-      border: none;
-      padding: 10px 16px;
+      margin-top: 10px;
+      padding: 12px 18px;
       font-size: 15px;
+      border: 2px dashed var(--primary);
       border-radius: var(--radius);
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-    }
-    .btn:hover { background:#1e7c43; transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,0.12); }
-    .btn.long { display:block; width:100%; text-align:center; margin-top:8px; }
-
-    /* Toast */
-    #toast { visibility:hidden; min-width:200px; background:var(--success); color:#fff; text-align:center;
-      border-radius:var(--radius); padding:12px; position:fixed; z-index:1000; left:50%; bottom:30px; transform:translateX(-50%);
+      background:#fff;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
     }
 
-    /* Loading 遮罩 */
-    #loadingOverlay { position:fixed; inset:0; background:rgba(255,255,255,0.8); display:none; justify-content:center; align-items:center; z-index:2000; }
-    #loadingOverlay div { background:var(--card-bg); padding:20px 30px; border-radius:var(--radius); font-size:16px; display:flex; align-items:center; gap:10px; }
-    .spinner { border:4px solid #f3f3f3; border-top:4px solid var(--primary); border-radius:50%; width:20px; height:20px; animation:spin 1s linear infinite; }
-    @keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);} }
+    table {width:100%;border-collapse:collapse;margin-top:15px;}
+    th,td {border:1px solid #ddd;padding:8px;text-align:center;}
+    th{background:#f5f5f5;}
 
-    /* 弹出输入 */
-    #popupInput { position:absolute; background:#fff; border:1px solid #ddd; border-radius:var(--radius); padding:12px; box-shadow:0 4px 10px rgba(0,0,0,0.15); display:none; z-index:500; }
+    #popupInput {
+      position:absolute;
+      background:#fff;
+      border:1px solid #ddd;
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:0 4px 10px rgba(0,0,0,.15);
+      display:none;
+      z-index:500;
+      width:220px;
+      text-align:center;
+    }
+    #popupInput b{display:block;margin-bottom:10px;}
+    #popupInput input {
+      display:block;
+      width:100%;
+      margin:6px 0;
+      padding:8px;
+      border:1px solid #ccc;
+      border-radius:var(--radius);
+      box-sizing:border-box;
+    }
 
-    /* 打印优化 */
     @media print {
-      header, #submitButton, .no-print { display:none !important; }
-      body, html { height:auto !important; min-height:auto !important; margin:0 !important; padding:0 !important; display:block !important; background:white !important; }
-      main { display:block !important; height:auto !important; padding:0 !important; }
-      .section { display:block !important; height:auto !important; min-height:auto !important; box-shadow:none !important; border:none !important; padding:0 !important; }
+      header, #submitButton, .no-print, #toast, #loadingOverlay {display:none!important;}
+      body,html,main,.section {
+        display:block!important;
+        height:auto!important;
+        margin:0!important;
+        padding:0!important;
+        background:#fff!important;
+        box-shadow:none!important;
+      }
     }
   </style>
 </head>
@@ -141,8 +182,8 @@
         <button class="product-button" data-name="Kampung">Kampung</button>
         <button class="product-button" data-name="KC">KC</button>
         <button class="product-button" data-name="Kahwin">KW</button>
-        <input type="text" id="customProductInput" placeholder="输入自定义产品名称" />
       </div>
+      <input type="text" id="customProductInput" placeholder="输入自定义产品名称 (按回车确认)" />
     </div>
 
     <!-- 右边预览区 -->
@@ -153,83 +194,187 @@
         <tbody id="invoiceItems"></tbody>
       </table>
       <p><strong>总计：</strong>RM <span id="totalAmount">0.00</span></p>
-      <div style="text-align:right;"><button id="submitButton" class="btn" style="display:none;">📤 提交到 Airtable</button></div>
+      <div style="text-align:right;">
+        <button id="submitButton" class="btn" style="display:none;">📤 提交到 Airtable</button>
+      </div>
     </div>
   </main>
 
-  <!-- 弹出输入 -->
+  <!-- popup 输入 -->
   <div id="popupInput">
-    <b id="popupProductName"></b><br/>
-    <input type="number" id="popupWeight" placeholder="重量(KG)" />
-    <input type="number" id="popupPrice" placeholder="单价(RM)" />
+    <b id="popupProductName"></b>
+    <input type="number" id="popupWeight" placeholder="重量 (KG)" />
+    <input type="number" id="popupPrice" placeholder="单价 (RM)" />
     <button onclick="confirmPopup()" class="btn long">确定</button>
   </div>
 
-  <div id="toast"></div>
-  <div id="loadingOverlay"><div><div class="spinner"></div><span id="loadingText">正在提交...</span></div></div>
+  <!-- Toast -->
+  <div id="toast" style="visibility:hidden;position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+        background:#333;color:#fff;padding:10px 20px;border-radius:8px;z-index:999;">提示</div>
 
-<script>
-const API_URL="https://syve-dinvoice-system.vercel.app/api/salestoken";
-const items=[]; let currentProduct=null;
-window.receiptNo=generateReceiptNo();
-function generateReceiptNo(){const now=new Date();const ymd=now.toISOString().slice(2,10).replace(/-/g,"");const rand=Math.floor(1000+Math.random()*9000);return `SLS-${ymd}-${rand}`;}
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+        background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;flex-direction:column;">
+     <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,.3);">
+       <span id="loadingText">Loading...</span>
+     </div>
+  </div>
 
-function selectProduct(name,btn){currentProduct=name;document.getElementById('popupProductName').innerText="🧺 "+name;const rect=btn.getBoundingClientRect();const popup=document.getElementById('popupInput');popup.style.top=(window.scrollY+rect.bottom+8)+"px";popup.style.left=(window.scrollX+rect.left)+"px";popup.style.display="block";}
-function confirmPopup(){const w=parseFloat(document.getElementById('popupWeight').value);const p=parseFloat(document.getElementById('popupPrice').value);if(currentProduct&&!isNaN(w)&&!isNaN(p)){items.push({product:currentProduct,weight:w,price:p});updateInvoice();showToast("✅ 添加成功");}else{alert("请填写重量和单价！");return;}document.getElementById('popupWeight').value="";document.getElementById('popupPrice').value="";document.getElementById('popupInput').style.display="none";document.getElementById('customProductInput').value="";}
-function updateInvoice(){const tbody=document.getElementById('invoiceItems');tbody.innerHTML='';let total=0;items.forEach((it,i)=>{const sub=it.weight*it.price;total+=sub;tbody.insertAdjacentHTML('beforeend',`<tr><td>${it.product}</td><td><input type="number" value="${it.weight}" onchange="editItem(${i},'weight',this.value)"></td><td><input type="number" value="${it.price.toFixed(2)}" onchange="editItem(${i},'price',this.value)"></td><td>${sub.toFixed(2)}</td><td><button onclick="deleteItem(${i})">❌ 删除</button></td></tr>`);});document.getElementById('totalAmount').innerText=total.toFixed(2);document.getElementById('submitButton').style.display=items.length?'inline-block':'none';}
-function deleteItem(i){if(confirm('确定删除?')){items.splice(i,1);updateInvoice();}}
-function editItem(i,f,v){const n=parseFloat(v);if(!isNaN(n)){items[i][f]=n;updateInvoice();}}
-function showToast(msg){const t=document.getElementById("toast");t.innerText=msg;t.style.visibility="visible";setTimeout(()=>t.style.visibility="hidden",2000);}
-function showLoading(msg="..."){document.getElementById("loadingText").innerText=msg;document.getElementById("loadingOverlay").style.display="flex";}
-function hideLoading(){document.getElementById("loadingOverlay").style.display="none";}
+  <script>
+    const API_URL="https://syve-dinvoice-system.vercel.app/api/salestoken";
+    const items=[];
+    let currentProduct=null;
+    let isCustom=false;
+    window.receiptNo=generateReceiptNo();
 
-function showReceiptPage(cust, items){
-  const now=new Date();const timeStr=now.toLocaleString('zh-MY');const no=window.receiptNo;
-  let itemsHTML='',tot=0;
-  items.forEach(it=>{const s=it.weight*it.price;tot+=s;itemsHTML+=`<tr><td>${it.product}</td><td>${it.weight.toFixed(2)}</td><td>RM ${it.price.toFixed(2)}</td><td>RM ${s.toFixed(2)}</td></tr>`;});
-  document.getElementById("mainContent").innerHTML=`
-    <div class="section">
-      <div class="header">Sales Receipt</div>
-      <p><b>客户：</b>${cust}</p>
-      <p><b>编号：</b>${no}</p>
-      <p><b>时间：</b>${timeStr}</p>
-      <table>
-        <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
-        <tbody>${itemsHTML}</tbody>
-        <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
-      </table>
-      <div style="text-align:center;margin-top:20px;">❀ Thank You ❀</div>
-      <div style="text-align:center;margin-top:20px;" class="no-print">
-        <button class="btn" onclick="window.print()">🖨 打印</button>
-        <button class="btn" onclick="window.location.reload()">⬅ 返回</button>
-      </div>
-    </div>`;
-}
-
-let isSubmitting=false;
-async function submitToAirtable(){
-  if(isSubmitting)return;isSubmitting=true;document.getElementById('submitButton').disabled=true;
-  const cust=document.getElementById('customerName').value.trim();
-  if(!cust||!items.length){alert('请填写客户名字并至少添加一项');isSubmitting=false;document.getElementById('submitButton').disabled=false;return;}
-  showLoading("正在提交...");
-  try{
-    for(const it of items){
-      const payload={fields:{"Receipt Number":window.receiptNo,"Customer Name":cust,"Product Name":it.product,"Unit Price":it.price,"Weight":it.weight,"Total Price":it.weight*it.price}};
-      const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-      if(!res.ok){alert("❌ 提交失败");hideLoading();return;}
+    function generateReceiptNo(){
+      const now=new Date();
+      const ymd=now.toISOString().slice(2,10).replace(/-/g,"");
+      const rand=Math.floor(1000+Math.random()*9000);
+      return `SLS-${ymd}-${rand}`;
     }
-    hideLoading();
-    showReceiptPage(cust,items);
-  }catch(e){alert("异常:"+e.message);hideLoading();}
-  finally{isSubmitting=false;document.getElementById('submitButton').disabled=false;}
-}
 
-window.addEventListener('DOMContentLoaded',()=>{
-  document.querySelectorAll('.product-button').forEach(b=>b.addEventListener('click',()=>selectProduct(b.dataset.name,b)));
-  document.getElementById('submitButton').addEventListener('click',submitToAirtable);
-  document.getElementById('backBtn').addEventListener('click',()=>window.location.href='main.html');
-  document.getElementById('customProductInput').addEventListener('input',e=>{const v=e.target.value.trim();if(v){selectProduct(v,e.target);}});
-});
-</script>
+    function selectProduct(name,btn){
+      currentProduct=name;
+      isCustom=false;
+      document.getElementById('popupProductName').innerText="🧺 "+name;
+      const rect=btn.getBoundingClientRect();
+      const popup=document.getElementById('popupInput');
+      popup.style.top=(window.scrollY+rect.bottom+8)+"px";
+      popup.style.left=(window.scrollX+rect.left)+"px";
+      popup.style.display="block";
+      document.getElementById('customProductInput').value="";
+    }
+
+    function confirmPopup(){
+      const w=parseFloat(document.getElementById('popupWeight').value);
+      const p=parseFloat(document.getElementById('popupPrice').value);
+      if(currentProduct&&!isNaN(w)&&!isNaN(p)){
+        items.push({product:currentProduct,weight:w,price:p});
+        updateInvoice();
+        showToast("✅ 添加成功");
+      } else {
+        alert("请填写重量和单价！");
+        return;
+      }
+      document.getElementById('popupWeight').value="";
+      document.getElementById('popupPrice').value="";
+      document.getElementById('popupInput').style.display="none";
+      if(isCustom){document.getElementById('customProductInput').value="";}
+    }
+
+    function updateInvoice(){
+      const tbody=document.getElementById('invoiceItems');
+      tbody.innerHTML='';
+      let total=0;
+      items.forEach((it,i)=>{
+        const sub=it.weight*it.price; total+=sub;
+        tbody.insertAdjacentHTML('beforeend',
+          `<tr><td>${it.product}</td>
+          <td><input type="number" value="${it.weight}" onchange="editItem(${i},'weight',this.value)"></td>
+          <td><input type="number" value="${it.price.toFixed(2)}" onchange="editItem(${i},'price',this.value)"></td>
+          <td>${sub.toFixed(2)}</td>
+          <td><button onclick="deleteItem(${i})">❌ 删除</button></td></tr>`);
+      });
+      document.getElementById('totalAmount').innerText=total.toFixed(2);
+      document.getElementById('submitButton').style.display=items.length?'inline-block':'none';
+    }
+
+    function editItem(i,f,v){const n=parseFloat(v);if(!isNaN(n)){items[i][f]=n;updateInvoice();}}
+    function deleteItem(i){if(confirm('确定删除?')){items.splice(i,1);updateInvoice();}}
+    function logout(){alert("已退出登录");}
+
+    function showToast(msg){
+      const t=document.getElementById("toast");
+      t.innerText=msg;t.style.visibility="visible";
+      setTimeout(()=>t.style.visibility="hidden",2000);
+    }
+    function showLoading(msg="..."){
+      document.getElementById("loadingText").innerText=msg;
+      document.getElementById("loadingOverlay").style.display="flex";
+    }
+    function hideLoading(){document.getElementById("loadingOverlay").style.display="none";}
+
+    function showReceiptPage(cust, items){
+      const now=new Date();const timeStr=now.toLocaleString('zh-MY');const no=window.receiptNo;
+      let itemsHTML='',tot=0;
+      items.forEach(it=>{const s=it.weight*it.price;tot+=s;itemsHTML+=`<tr><td>${it.product}</td><td>${it.weight.toFixed(2)}</td><td>RM ${it.price.toFixed(2)}</td><td>RM ${s.toFixed(2)}</td></tr>`;});
+      document.getElementById("mainContent").innerHTML=`
+        <div class="section">
+          <div class="header">Sales Receipt</div>
+          <p><b>客户：</b>${cust}</p>
+          <p><b>编号：</b>${no}</p>
+          <p><b>时间：</b>${timeStr}</p>
+          <table>
+            <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
+            <tbody>${itemsHTML}</tbody>
+            <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
+          </table>
+          <div style="text-align:center;margin-top:20px;">❀ Thank You ❀</div>
+          <div style="text-align:center;margin-top:20px;" class="no-print">
+            <button class="btn" onclick="window.print()">🖨 打印</button>
+            <button class="btn" onclick="window.location.reload()">⬅ 返回</button>
+          </div>
+        </div>`;
+    }
+
+    let isSubmitting=false;
+    async function submitToAirtable(){
+      if(isSubmitting)return;isSubmitting=true;
+      document.getElementById('submitButton').disabled=true;
+      const cust=document.getElementById('customerName').value.trim();
+      if(!cust||!items.length){
+        alert('请填写客户名字并至少添加一项');
+        isSubmitting=false;document.getElementById('submitButton').disabled=false;
+        return;
+      }
+      showLoading("正在提交...");
+      try{
+        for(const it of items){
+          const payload={fields:{"Receipt Number":window.receiptNo,"Customer Name":cust,"Product Name":it.product,"Unit Price":it.price,"Weight":it.weight,"Total Price":it.weight*it.price}};
+          const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+          if(!res.ok){alert("❌ 提交失败");hideLoading();return;}
+        }
+        hideLoading();
+        showReceiptPage(cust,items);
+      }catch(e){alert("异常:"+e.message);hideLoading();}
+      finally{isSubmitting=false;document.getElementById('submitButton').disabled=false;}
+    }
+
+    // 自定义输入框监听
+    const custom=document.getElementById('customProductInput');
+    custom.addEventListener('input',()=>{
+      const v=custom.value.trim();
+      const popup=document.getElementById('popupInput');
+      if(v){
+        currentProduct=v;
+        isCustom=true;
+        document.getElementById('popupProductName').innerText="🧺 "+v;
+        const rect=custom.getBoundingClientRect();
+        popup.style.top=(window.scrollY+rect.bottom+8)+"px";
+        popup.style.left=(window.scrollX+rect.left)+"px";
+        popup.style.display="block";
+      }else{popup.style.display="none";}
+    });
+
+    // 点击空白处关闭 popup
+    document.addEventListener('click',(e)=>{
+      const popup=document.getElementById('popupInput');
+      if(popup.style.display==="block"
+         &&!popup.contains(e.target)
+         &&!e.target.classList.contains('product-button')
+         &&e.target.id!=="customProductInput"){
+        popup.style.display="none";
+        document.getElementById('popupWeight').value="";
+        document.getElementById('popupPrice').value="";
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded',()=>{
+      document.querySelectorAll('.product-button').forEach(b=>b.addEventListener('click',()=>selectProduct(b.dataset.name,b)));
+      document.getElementById('submitButton').addEventListener('click',submitToAirtable);
+      document.getElementById('backBtn').addEventListener('click',()=>window.location.href='main.html');
+    });
+  </script>
 </body>
 </html>
