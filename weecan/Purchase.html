@@ -28,7 +28,7 @@
     th{background:#fdf2c5;font-weight:600;}
     #toast{visibility:hidden;min-width:200px;background:var(--success);color:#fff;text-align:center;border-radius:var(--radius);padding:12px;position:fixed;z-index:1000;left:50%;bottom:30px;transform:translateX(-50%);}
     #loadingOverlay{position:fixed;inset:0;background:rgba(255,255,255,0.8);display:none;justify-content:center;align-items:center;z-index:2000;}
-    #loadingOverlay div{background:var(--card-bg);padding:20px 30px;border-radius:var(--radius);font-size:20px;display:flex;align-items:center;gap:10px;}
+    #loadingOverlay div{background:var(--card-bg);padding:20px 30px;border-radius:var(--radius);font-size:16px;display:flex;align-items:center;gap:10px;}
     .spinner{border:4px solid #f3f3f3;border-top:4px solid var(--primary);border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;}
     @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
     /* 弹窗 */
@@ -54,42 +54,17 @@
     }
     #submitButton:hover {background:#1e7c43;}
     /* 打印优化 */
-    /* 🔥 打印机优化样式（50mm 热敏纸） */
     @media print {
-      body {
-        width: 280px;        /* 限制打印宽度 */
-        font-size: 16px;     /* 放大字体 */
-        line-height: 1.4;
+      header,.header-actions,button {display:none !important;}
+      body,html {
+        height:auto !important;min-height:auto !important;margin:0 !important;padding:0 !important;
+        display:block !important;background:white !important;
       }
-      header, .header-actions, #submitButton, #popupInput, #loadingOverlay {
-        display: none !important; /* 不打印按钮和交互UI */
-      }
-      table {
-        width: 100%;
-        font-size: 16px;
-        border-collapse: collapse;
-      }
-      th, td {
-        border: none;        /* 去掉复杂边框 */
-        text-align: left;
-        padding: 4px 0;
-      }
-      th {
-        font-weight: bold;
-        border-bottom: 1px dashed #000;
-      }
-      tfoot td {
-        border-top: 1px dashed #000;
-        font-weight: bold;
-      }
-      /* 居中标题/页脚 */
-      .header, .footer {
-        text-align: center;
-        font-weight: bold;
-        margin: 8px 0;
+      main,.section {
+        display:block !important;height:auto !important;min-height:auto !important;
+        padding:0 !important;box-shadow:none !important;border:none !important;
       }
     }
-
   </style>
 </head>
 <body>
@@ -172,7 +147,7 @@ function generateReceiptNo(){
   const now=new Date();
   const ymd=now.toISOString().slice(2,10).replace(/-/g,"");
   const rand=Math.floor(1000+Math.random()*9000);
-  return RCPT-${ymd}-${rand};
+  return `RCPT-${ymd}-${rand}`;
 }
 
 let currentProduct=null;
@@ -235,7 +210,7 @@ document.addEventListener('click',(e)=>{
 function showReceiptPage(cust, items){
   const now=new Date();const timeStr=now.toLocaleString('zh-MY');const no=window.receiptNo;
   let itemsHTML='',tot=0;
-  items.forEach(it=>{const s=it.weight*it.price;tot+=s;itemsHTML+=<tr><td>${it.product}</td><td>${it.weight.toFixed(2)}</td><td>RM ${it.price.toFixed(2)}</td><td>RM ${s.toFixed(2)}</td></tr>;});
+  items.forEach(it=>{const s=it.weight*it.price;tot+=s;itemsHTML+=`<tr><td>${it.product}</td><td>${it.weight.toFixed(2)}</td><td>RM ${it.price.toFixed(2)}</td><td>RM ${s.toFixed(2)}</td></tr>`;});
   document.getElementById("mainContent").innerHTML=`
     <div class="section">
       <div class="header">Purchase Receipt</div>
