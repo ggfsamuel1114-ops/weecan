@@ -191,6 +191,14 @@
     <h2>📜 Sales History</h2>
     <button onclick="logout()">🚪 退出登录</button>
   </header>
+  
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // 没有登录，直接跳转到 login.html
+      window.location.href = "login.html";
+    }
+  </script>
 
   <main>
     <input type="text" id="searchBar" placeholder="🔍 搜索收据编号、客户名、金额或日期..." oninput="filterTable()" />
@@ -234,22 +242,6 @@
 
   <!-- auth.js 登录校验 -->
   <script src="auth.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        document.body.innerHTML = `
-          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
-            <h2 style="color:#e74c3c;">❌ Access Denied</h2>
-            <p>You must login before using the system.</p>
-            <a href="login.html" style="margin-top:20px;padding:10px 20px;background:#3498db;color:white;border-radius:6px;text-decoration:none;">
-              🔑 Go to Login
-            </a>
-          </div>
-        `;
-      }
-    });
-  </script>
   
   <script>
     const API_URL = "https://syve-dinvoice-system.vercel.app/api/salesreceipt";
