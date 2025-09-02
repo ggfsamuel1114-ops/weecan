@@ -240,7 +240,6 @@
           </tr>`;
       });
     
-      // 新开一个预览窗口（手机 + 电脑统一逻辑）
       const win = window.open("", "_blank");
       win.document.write(`
         <html>
@@ -256,6 +255,10 @@
               tfoot td { font-weight: bold; background: #f5f5f5; }
               .btn { margin: 10px; padding: 8px 16px; border:none; border-radius:6px; background:#3498db; color:#fff; cursor:pointer; }
               .btn:hover { background:#2c80b4; }
+              /* 打印时隐藏按钮 */
+              @media print {
+                .no-print { display: none !important; }
+              }
             </style>
           </head>
           <body>
@@ -274,8 +277,8 @@
             </table>
             <div style="text-align:center;margin-top:15px">❀ Thank You ❀</div>
     
-            <!-- 按钮区域 -->
-            <div style="text-align:center; margin-top:30px;">
+            <!-- 按钮区域（打印时隐藏） -->
+            <div class="no-print" style="text-align:center; margin-top:30px;">
               <button class="btn" onclick="window.print()">🖨 打印 / 存 PDF</button>
               <button class="btn" onclick="window.close()">⬅ 返回</button>
             </div>
@@ -284,8 +287,6 @@
       `);
       win.document.close();
     }
-
-
     // 初始化数据
     fetchAllReceipts().then(records => {
       allRecords = records;
