@@ -232,11 +232,21 @@
 
   <!-- Loading Overlay -->
   <div id="loadingOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;
-        background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;flex-direction:column;">
-     <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,.3);">
-       <span id="loadingText">Loading...</span>
-     </div>
+          background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;flex-direction:column;">
+    <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 0 10px rgba(0,0,0,.3);text-align:center;">
+      <!-- 🔵 蓝色转圈 -->
+      <div class="spinner" style="margin:0 auto 10px;width:40px;height:40px;border:4px solid #3498db;border-top:4px solid transparent;border-radius:50%;animation:spin 1s linear infinite;"></div>
+      <span id="loadingText">Loading...</span>
+    </div>
   </div>
+
+  <style>
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  </style>
+
 
   <script>
     const API_URL="https://syve-dinvoice-system.vercel.app/api/salestoken";
