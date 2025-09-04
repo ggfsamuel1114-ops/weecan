@@ -360,8 +360,6 @@
     function prevPage() { if (currentPage > 1) { currentPage--; renderTable(currentPage); } }
     function nextPage() { if (currentPage < Math.ceil(filteredRows.length / rowsPerPage)) { currentPage++; renderTable(currentPage); } }
 
-    // 打印函数保持不变（可打印 A4 / 小票）
-    // 打印函数：支持 A4 / 小票
     function printOne(receiptNo) {
       const rows = allRecords.filter(r => r.fields["Receipt Number"] === receiptNo);
       if (!rows.length) return alert("Invoice not found");
@@ -376,7 +374,12 @@
         const price = parseFloat(r.fields["Unit Price"]) || 0;
         const subtotal = weight * price;
         tot += subtotal;
-        itemsHTML += `<tr><td>${product}</td><td>${weight.toFixed(2)} kg</td><td>RM ${price.toFixed(2)}</td><td>RM ${subtotal.toFixed(2)}</td></tr>`;
+        itemsHTML += `<tr>
+          <td>${product}</td>
+          <td>${weight.toFixed(2)} kg</td>
+          <td>RM ${price.toFixed(2)}</td>
+          <td>RM ${subtotal.toFixed(2)}</td>
+        </tr>`;
       });
     
       const win = window.open("", "_blank");
@@ -393,7 +396,29 @@
               th, td { border: 1px solid #000; padding: 6px; text-align: center; }
               tfoot td { font-weight: bold; background: #f9f9f9; }
               .footer { text-align: center; margin-top: 20px; }
-              .btn { margin: 10px; padding: 8px 16px; border: none; border-radius: 6px; background: #3498db; color: #fff; cursor: pointer; }
+              .no-print {
+                text-align: center;
+                margin-top: 20px;
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+              }
+              .no-print .btn {
+                flex: 0 0 120px;
+                padding: 10px 0;
+                font-size: 12pt;
+                border: none;
+                border-radius: 8px;
+                background: linear-gradient(135deg, #3498db, #2c80b4);
+                color: #fff;
+                cursor: pointer;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+                transition: all 0.25s ease;
+              }
+              .no-print .btn:hover {
+                background: linear-gradient(135deg, #2c80b4, #246a91);
+                transform: translateY(-2px);
+              }
               @media print { .no-print { display: none !important; } }
             </style>
           </head>
@@ -408,7 +433,7 @@
               <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
             </table>
             <div class="footer">❀ Thank You ❀</div>
-            <div class="no-print" style="text-align:center; margin-top:20px;">
+            <div class="no-print">
               <button class="btn" onclick="setPaper('a4')">🖨 打印 A4</button>
               <button class="btn" onclick="setPaper('receipt')">🧾 打印小票</button>
               <button class="btn" onclick="window.close()">⬅ 返回</button>
@@ -416,35 +441,34 @@
             <script>
               function setPaper(type) {
                 var style = document.getElementById("printStyle");
-                let baseStyle = \`
-                  body { font-family: Arial; font-size: 12pt; padding: 20px; }
-                  .header { text-align:center; font-size:18pt; font-weight:bold; margin-bottom:15px; }
-                  table { width:100%; border-collapse:collapse; margin-top:10px; }
-                  th,td { border:1px solid #000; padding:6px; text-align:center; }
-                  tfoot td { font-weight:bold; background:#f9f9f9; }
-                  .footer { text-align:center; margin-top:20px; }
-                  @media print { .no-print { display:none !important; } }
-                \`;
                 if (type === "a4") {
-                  style.innerHTML = \`@page { size: A4 portrait; margin: 15mm; } \${baseStyle}\`;
+                  style.innerHTML = \`
+                    @page { size: A4 portrait; margin: 15mm; }
+                    body { font-family: Arial; font-size: 12pt; padding: 20px; }
+                    .header { text-align:center; font-size:18pt; font-weight:bold; margin-bottom:15px; }
+                    table { width:100%; border-collapse:collapse; margin-top:10px; }
+                    th,td { border:1px solid #000; padding:6px; text-align:center; }
+                    tfoot td { font-weight:bold; background:#f9f9f9; }
+                    @media print { .no-print { display:none !important; } }
+                  \`;
                 } else {
                   style.innerHTML = \`
-                    @page { size: 48mm 500mm; margin: 2mm; }
-                    body {
+                    @page { size: 48mm auto; margin: 0; }
+                    body { display:flex; justify-content:center; margin:0; padding:0; }
+                    .ticket {
                       width:48mm;
-                      min-height:180mm; /* 保证小票至少这么长 */
                       font-family: monospace,Arial;
                       font-size:10pt;
-                      margin:0;
                       padding:2mm;
+                      box-sizing:border-box;
                     }
                     .header { text-align:center; font-size:12pt; font-weight:bold; margin-bottom:10px; }
                     table { width:100%; font-size:9pt; border-collapse:collapse; }
                     th,td { border:none; text-align:left; padding:2px 0; }
                     tfoot td { border-top:1px dashed #000; font-weight:bold; }
-                    .footer { text-align:center; margin-top:10px; }
                     @media print { .no-print { display:none !important; } }
                   \`;
+                  document.body.innerHTML = '<div class="ticket">' + document.body.innerHTML + '</div>';
                 }
                 window.print();
               }
@@ -454,7 +478,6 @@
       `);
       win.document.close();
     }
-
 
     fetchAllReceipts().then(records => {
       allRecords = records;
