@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -404,14 +405,20 @@
               th { background: #f2f2f2; }
               tfoot td { font-weight: bold; background: #f9f9f9; }
               .footer { text-align: center; margin-top: 20px; font-size: 11pt; color:#000 !important; }
+    
+              /* 🔥 底部按钮始终在中间 */
               .no-print {
-                margin-top: 20px;
+                margin-top: 30px;
+                width: 100%;
                 display: flex;
-                justify-content: center;
-                gap: 15px;
+                justify-content: center;   /* 水平居中 */
               }
-              .no-print .btn {
-                flex: 0 0 120px;
+              .btn-group {
+                display: flex;
+                gap: 25px;                 /* 按钮间距 */
+              }
+              .btn {
+                min-width: 140px;
                 padding: 10px 0;
                 font-size: 12pt;
                 border: none;
@@ -421,14 +428,11 @@
                 cursor: pointer;
                 box-shadow: 0 2px 6px rgba(0,0,0,0.2);
               }
-              .no-print .btn:hover {
-                background: linear-gradient(135deg, #2c80b4, #246a91);
-              }
               @media print { .no-print { display: none !important; } }
             </style>
           </head>
           <body>
-            <div class="header">Purchase Invoice</div>
+            <div class="header">Sales Invoice</div>
             <p><b>客户:</b> ${cust}</p>
             <p><b>收据编号:</b> ${receiptNo}</p>
             <p><b>时间:</b> ${timeStr}</p>
@@ -438,27 +442,23 @@
               <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
             </table>
             <div class="footer">❀ Thank You ❀</div>
+    
+            <!-- 底部操作按钮 ✅ 居中 -->
             <div class="no-print">
-              <button class="btn" onclick="setPaper('a4')">🖨 打印 A4</button>
-              <button class="btn" onclick="setPaper('receipt')">🧾 打印小票</button>
-              <button class="btn" onclick="window.close()">⬅ 返回</button>
+              <div class="btn-group">
+                <button class="btn" onclick="setPaper('a4')">🖨 打印 A4</button>
+                <button class="btn" onclick="setPaper('receipt')">🧾 打印小票</button>
+                <button class="btn" onclick="window.close()">⬅ 返回</button>
+              </div>
             </div>
+    
             <script>
               function setPaper(type) {
                 var style = document.getElementById("printStyle");
                 if (type === "a4") {
                   style.innerHTML = \`
                     @page { size: A4 portrait; margin: 15mm; }
-                    body { 
-                      font-family: Arial; 
-                      font-size: 12pt; 
-                      padding: 20px; 
-                      color: #000 !important; 
-                      font-weight: 600; 
-                      -webkit-print-color-adjust: exact !important;
-                      print-color-adjust: exact !important;
-                      height: auto !important;
-                    }
+                    body { font-family: Arial; font-size: 12pt; padding: 20px; color: #000 !important; font-weight: 600; }
                     table { width:100%; border-collapse:collapse; margin-top:10px; }
                     th,td { border:1px solid #000; padding:6px; text-align:center; color:#000 !important; }
                     tfoot td { font-weight:bold; background:#f9f9f9; }
@@ -468,12 +468,7 @@
                 } else {
                   style.innerHTML = \`
                     @page { size: 58mm auto; margin: 0; }
-                    body { 
-                      margin:0; padding:0; display:flex; justify-content:center; height: auto !important;
-                      color:#000 !important;
-                      -webkit-print-color-adjust: exact !important;
-                      print-color-adjust: exact !important;
-                    }
+                    body { margin:0; padding:0; display:flex; justify-content:center; height:auto !important; color:#000 !important; }
                     .ticket { width:58mm; max-width:58mm; font-family: monospace, Arial; font-size:10pt; padding:2mm; box-sizing:border-box; }
                     table { width:100%; font-size:9pt; border-collapse:collapse; }
                     th,td { border:none; text-align:left; padding:2px 0; color:#000 !important; }
@@ -493,6 +488,9 @@
       `);
       win.document.close();
     }
+
+
+
 
 
 
