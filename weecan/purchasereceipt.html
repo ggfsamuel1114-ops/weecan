@@ -431,22 +431,26 @@
                 margin-top: 20px;
                 display: flex;
                 justify-content: center;
-                gap: 15px;
+                gap: 8px;
               }
+              
               .no-print .btn {
-                flex: 0 0 120px;
-                padding: 10px 0;
-                font-size: 12pt;
-                border: none;
-                border-radius: 8px;
-                background: linear-gradient(135deg, #3498db, #2c80b4);
-                color: #fff;
+                padding: 6px 12px;
+                font-size: 10pt;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                background: #fafafa;
+                color: #333;
                 cursor: pointer;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+                transition: all 0.2s ease;
               }
+              
               .no-print .btn:hover {
-                background: linear-gradient(135deg, #2c80b4, #246a91);
+                background: #f1c40f;   /* hover 时才变黄 */
+                border-color: #d4ac0d;
+                color: #fff;
               }
+
               @media print { .no-print { display: none !important; } }
             </style>
           </head>
