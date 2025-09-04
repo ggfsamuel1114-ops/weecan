@@ -321,6 +321,7 @@
     }
 
     // ✅ 打印样式
+    // ✅ 打印样式
     function setPaper(type){
       if(type==='a4'){
         const style=`@page { size: A4 portrait; margin: 15mm; }
@@ -347,13 +348,37 @@
             font-family:monospace; font-size:11pt;
             box-shadow:none!important; border:none!important; padding:4px!important;
           }
-          table {width:100%;font-size:10pt;border-collapse:collapse;}
-          th,td {padding:2px 0;text-align:left;color:#000 !important;}
-          tfoot td {border-top:1px dashed #000;font-weight:bold;color:#000 !important;}`; 
+          table {
+            width:100% !important;
+            table-layout: fixed !important;   /* 🔑 固定列宽 */
+            border-collapse: collapse !important;
+            word-wrap: break-word;            /* 🔑 自动换行 */
+            font-size:10pt;
+          }
+          th,td {
+            padding:2px 2px;
+            text-align:left;
+            color:#000 !important;
+            border:1px solid #000 !important; /* 🔑 确保边框完整 */
+          }
+          thead th:nth-child(1),
+          tbody td:nth-child(1) { width:35%; }  /* 产品 */
+          thead th:nth-child(2),
+          tbody td:nth-child(2) { width:20%; }  /* 重量 */
+          thead th:nth-child(3),
+          tbody td:nth-child(3) { width:20%; }  /* 单价 */
+          thead th:nth-child(4),
+          tbody td:nth-child(4) { width:25%; }  /* 总价 */
+          tfoot td {
+            border-top:1px dashed #000;
+            font-weight:bold;
+            color:#000 !important;
+          }`; 
         applyPrintStyle(style);
       }
       window.print();
     }
+
 
 
     function applyPrintStyle(css){
