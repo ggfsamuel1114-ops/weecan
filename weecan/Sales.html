@@ -116,16 +116,42 @@
       box-sizing:border-box;
     }
     @media print {
-      header, #submitButton, .no-print, #toast, #loadingOverlay {display:none!important;}
-      body,html,main,.section {
-        display:block!important;
-        height:auto!important;
-        margin:0!important;
-        padding:0!important;
-        background:#fff!important;
-        box-shadow:none!important;
-      }
+    * {
+      color: #000 !important;
+      background: #fff !important;
+      box-shadow: none !important;
     }
+    body, html {
+      margin: 0 !important;
+      padding: 0 !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      font-weight: 600 !important;
+    }
+    .receipt-container {
+      width: 100% !important;
+      margin: 0 auto !important;
+      padding: 0 !important;
+      border: none !important;
+      background: #fff !important;
+    }
+    table {
+      border-collapse: collapse !important;
+      width: 100% !important;
+    }
+    th, td {
+      border: 1px solid #000 !important;
+      padding: 6px !important;
+      text-align: center !important;
+      color: #000 !important;
+      font-size: 12pt !important;
+    }
+    tfoot td {
+      font-weight: bold !important;
+      border-top: 2px solid #000 !important;
+    }
+  }
+
   </style>
 </head>
 <body>
@@ -328,9 +354,22 @@
 
     function applyPrintStyle(css){
       let s=document.getElementById('printStyle');
-      if(!s){s=document.createElement('style');s.id='printStyle';document.head.appendChild(s);}
-      s.innerHTML=css+`@media print{.no-print{display:none!important;}}`;
+      if(!s){
+        s=document.createElement('style');
+        s.id='printStyle';
+        document.head.appendChild(s);
+      }
+      s.innerHTML = `
+        ${css}
+        @media print {
+          * { color:#000 !important; background:#fff !important; box-shadow:none !important; }
+          body, html { margin:0 !important; padding:0 !important; font-weight:600 !important;
+            -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          .no-print { display:none !important; }
+        }
+      `;
     }
+
 
     let isSubmitting=false;
     async function submitToAirtable(){
