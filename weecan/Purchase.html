@@ -39,7 +39,45 @@
     #popupInput button:hover {background: var(--primary-dark);}
     #submitButton {background: linear-gradient(135deg,var(--success),#219150);border: none;padding: 10px 16px;color: white;font-size: 15px;border-radius: var(--radius);cursor: pointer;}
     #submitButton:hover {background:#1e7c43;}
-    @media print {.no-print, header, #submitButton, #toast, #loadingOverlay {display:none!important;}}
+    @media print {
+    * {
+      color: #000 !important;
+      background: #fff !important;
+      box-shadow: none !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      font-weight: 700 !important; /* 加深黑色 */
+    }
+    body, html {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    header { display: none !important; }   /* 不打印顶部 Sales + 按钮 */
+    .no-print { display: none !important; }
+    .receipt-container {
+      width: 100% !important;
+      margin: 0 auto !important;
+      padding: 0 !important;
+      border: none !important;
+      background: #fff !important;
+    }
+    table {
+      border-collapse: collapse !important;
+      width: 100% !important;
+    }
+    th, td {
+      border: 1px solid #000 !important;
+      padding: 6px !important;
+      text-align: center !important;
+      font-size: 12pt !important;
+      color: #000 !important;
+      font-weight: 700 !important;
+    }
+    tfoot td {
+      font-weight: 700 !important;
+      border-top: 2px solid #000 !important;
+    }
+  }
   </style>
 </head>
 <body>
