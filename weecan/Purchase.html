@@ -39,7 +39,10 @@
     #popupInput button:hover {background: var(--primary-dark);}
     #submitButton {background: linear-gradient(135deg,var(--success),#219150);border: none;padding: 10px 16px;color: white;font-size: 15px;border-radius: var(--radius);cursor: pointer;}
     #submitButton:hover {background:#1e7c43;}
-    @media print {.no-print, header, #submitButton, #toast, #loadingOverlay {display:none!important;}}
+    @media print {
+      header, .no-print, #submitButton, #toast, #loadingOverlay {display:none!important;}
+      * {color:#000!important;font-weight:700!important;background:#fff!important;}
+    }
   </style>
 </head>
 <body>
@@ -193,106 +196,55 @@ function showReceiptPage(cust, items){
     </tr>`;
   });
 
-  // ✅ 把收据和按钮都包在一个 receipt-container 里
   document.getElementById("mainContent").innerHTML=`
-    <div class="receipt-container" style="max-width:420px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:20px;">
-      
-      <div class="receipt-box" style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.1);width:100%;">
-        <h2 style="text-align:center;margin-bottom:15px;">Purchase Receipt</h2>
-        <p><b>客户：</b>${cust}</p>
-        <p><b>编号：</b>${no}</p>
-        <p><b>时间：</b>${timeStr}</p>
-        <table style="width:100%;border-collapse:collapse;margin-top:10px;">
-          <thead>
-            <tr style="background:#fdf2c5;">
-              <th>产品</th><th>重量</th><th>单价</th><th>总价</th>
-            </tr>
-          </thead>
-          <tbody>${itemsHTML}</tbody>
-          <tfoot>
-            <tr><td colspan="3" style="font-weight:bold;">总计</td><td>RM ${tot.toFixed(2)}</td></tr>
-          </tfoot>
-        </table>
-        <div style="text-align:center;margin-top:20px;">❀ Thank You ❀</div>
-      </div>
-
-      <div class="action-buttons no-print" style="display:flex;justify-content:center;gap:12px;width:100%;">
-        <button onclick="setPaper('a4')" 
-          style="flex:1;padding:12px;border-radius:8px;background:#3498db;color:#fff;border:none;font-size:15px;">
-          🖨 打印 A4
-        </button>
-        <button onclick="setPaper('receipt')" 
-          style="flex:1;padding:12px;border-radius:8px;background:#3498db;color:#fff;border:none;font-size:15px;">
-          🧾 打印小票
-        </button>
-        <button onclick="window.location.reload()" 
-          style="flex:1;padding:12px;border-radius:8px;background:#e67e22;color:#fff;border:none;font-size:15px;">
-          ⬅ 返回
-        </button>
+    <div class="receipt-container" style="max-width:600px;margin:0 auto;">
+      <h2 style="text-align:center;margin-bottom:15px;">Purchase Receipt</h2>
+      <p><b>客户：</b>${cust}</p>
+      <p><b>编号：</b>${no}</p>
+      <p><b>时间：</b>${timeStr}</p>
+      <table>
+        <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
+        <tbody>${itemsHTML}</tbody>
+        <tfoot><tr><td colspan="3"><b>总计</b></td><td><b>RM ${tot.toFixed(2)}</b></td></tr></tfoot>
+      </table>
+      <div style="text-align:center;margin-top:20px;">❀ Thank You ❀</div>
+      <div class="no-print" style="display:flex;gap:12px;margin-top:20px;justify-content:center;">
+        <button onclick="setPaper('a4')" style="padding:10px 16px;border-radius:8px;background:#3498db;color:#fff;border:none;">🖨 打印 A4</button>
+        <button onclick="setPaper('receipt')" style="padding:10px 16px;border-radius:8px;background:#3498db;color:#fff;border:none;">🧾 打印小票</button>
+        <button onclick="window.location.reload()" style="padding:10px 16px;border-radius:8px;background:#e67e22;color:#fff;border:none;">⬅ 返回</button>
       </div>
     </div>`;
 }
 
-
-
 function setPaper(type){
   if(type==='a4'){
     const style=`@page { size: A4 portrait; margin: 15mm; }
-      body, html {
-        margin:0;
-        padding:0;
-        height:auto !important;
-        background:#fff !important;
-      }
-      main { display:block !important; padding:0 !important; }
-      .receipt-container {
-        width:100% !important;
-        max-width:100% !important;
-        margin:0 auto !important;
-        box-shadow:none !important;
-        border:none !important;
-        padding:0 !important;
-      }
+      body, html {margin:0;padding:0;background:#fff!important;}
+      .receipt-container {width:100%!important;}
       table {width:100%;border-collapse:collapse;margin-top:10px;}
       th,td {border:1px solid #000;padding:6px;text-align:center;}
-      tfoot td {font-weight:bold;border-top:2px solid #000;}`; 
+      tfoot td {font-weight:bold;border-top:2px solid #000;}`;
     applyPrintStyle(style);
   } else {
     const style=`@page { size: 58mm auto; margin:0; }
-      body { margin:0; }
-      .receipt-container {
-        width:58mm!important;
-        max-width:58mm!important;
-        font-family:monospace;
-        font-size:10pt;
-        box-shadow:none!important;
-        border:none!important;
-        padding:4px!important;
-      }
-      table {width:100%;font-size:9pt;border-collapse:collapse;}
-      th,td {padding:2px 0;text-align:left;}
-      tfoot td {border-top:1px dashed #000;font-weight:bold;}`; 
+      body {margin:0;}
+      .receipt-container {width:58mm!important;max-width:58mm!important;font-family:monospace;font-size:9pt;}
+      table {width:100%!important;table-layout:fixed!important;border-collapse:collapse;font-size:9pt;}
+      th,td {border:1px solid #000!important;padding:2px;text-align:left;word-wrap:break-word;}
+      thead th:nth-child(1),tbody td:nth-child(1){width:35%;}
+      thead th:nth-child(2),tbody td:nth-child(2){width:20%;}
+      thead th:nth-child(3),tbody td:nth-child(3){width:20%;}
+      thead th:nth-child(4),tbody td:nth-child(4){width:25%;}
+      tfoot td {border-top:1px dashed #000;font-weight:bold;}`;
     applyPrintStyle(style);
   }
   window.print();
 }
 
-
-
 function applyPrintStyle(css){
   let s=document.getElementById('printStyle');
-  if(!s){
-    s=document.createElement('style');
-    s.id='printStyle';
-    document.head.appendChild(s);
-  }
+  if(!s){s=document.createElement('style');s.id='printStyle';document.head.appendChild(s);}
   s.innerHTML=css+`@media print{.no-print{display:none!important;}}`;
-}
-
-function wrapTicket(){
-  if(!document.querySelector('.ticket')){
-    document.body.innerHTML='<div class="ticket">'+document.body.innerHTML+'</div>';
-  }
 }
 
 let isSubmitting=false;
