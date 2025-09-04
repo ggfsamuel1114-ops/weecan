@@ -25,7 +25,7 @@
     input[type="text"],input[type="number"]{padding:10px;font-size:15px;border:1px solid #ccd;border-radius:var(--radius);width:100%;box-sizing:border-box;}
     table{width:100%;border-collapse:collapse;margin-top:15px;}
     th,td{border:1px solid #ddd;padding:10px;text-align:center;}
-    th{background:#fdf2c5;font-weight:600;}
+    th{background:#fdf2c5;font-weight:700;}
     #toast{visibility:hidden;min-width:200px;background:var(--success);color:#fff;text-align:center;border-radius:var(--radius);padding:12px;position:fixed;z-index:1000;left:50%;bottom:30px;transform:translateX(-50%);}
     #loadingOverlay{position:fixed;inset:0;background:rgba(255,255,255,0.8);display:none;justify-content:center;align-items:center;z-index:2000;}
     #loadingOverlay div{background:var(--card-bg);padding:20px 30px;border-radius:var(--radius);font-size:16px;display:flex;align-items:center;gap:10px;}
@@ -33,16 +33,13 @@
     @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
     /* 弹窗 */
     #popupInput{position:absolute;background:#fff;border:1px solid #ddd;border-radius:var(--radius);padding:16px;box-shadow:0 4px 10px rgba(0,0,0,0.15);display:none;z-index:999;min-width:220px;}
-    #popupInput b{display:block;margin-bottom:14px;font-weight:600;}
+    #popupInput b{display:block;margin-bottom:14px;font-weight:700;}
     #popupInput input{display:block;width:100%;margin:12px 0;padding:10px;border:1px solid #ccc;border-radius:var(--radius);font-size:15px;box-sizing:border-box;}
     #popupInput button {background: var(--primary);border: none;padding: 12px;color: white;font-size: 15px;border-radius: var(--radius);cursor: pointer;margin-top: 12px;width: 100%;}
     #popupInput button:hover {background: var(--primary-dark);}
     #submitButton {background: linear-gradient(135deg,var(--success),#219150);border: none;padding: 10px 16px;color: white;font-size: 15px;border-radius: var(--radius);cursor: pointer;}
     #submitButton:hover {background:#1e7c43;}
-    @media print {
-      header, .no-print, #submitButton, #toast, #loadingOverlay {display:none!important;}
-      * {color:#000!important;font-weight:700!important;background:#fff!important;}
-    }
+    @media print {.no-print, header, #submitButton, #toast, #loadingOverlay {display:none!important;}}
   </style>
 </head>
 <body>
@@ -197,105 +194,55 @@ function showReceiptPage(cust, items){
   });
 
   document.getElementById("mainContent").innerHTML=`
-    <div class="receipt-container" style="max-width:600px;margin:0 auto;">
-      <h2 style="text-align:center;margin-bottom:15px;">Purchase Receipt</h2>
-      <p><b>客户：</b>${cust}</p>
-      <p><b>编号：</b>${no}</p>
-      <p><b>时间：</b>${timeStr}</p>
-      <table>
-        <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
-        <tbody>${itemsHTML}</tbody>
-        <tfoot><tr><td colspan="3"><b>总计</b></td><td><b>RM ${tot.toFixed(2)}</b></td></tr></tfoot>
-      </table>
-      <div style="text-align:center;margin-top:20px;">❀ Thank You ❀</div>
-      <div class="no-print" style="display:flex;gap:12px;margin-top:20px;justify-content:center;">
-        <button onclick="setPaper('a4')" style="padding:10px 16px;border-radius:8px;background:#3498db;color:#fff;border:none;">🖨 打印 A4</button>
-        <button onclick="setPaper('receipt')" style="padding:10px 16px;border-radius:8px;background:#3498db;color:#fff;border:none;">🧾 打印小票</button>
-        <button onclick="window.location.reload()" style="padding:10px 16px;border-radius:8px;background:#e67e22;color:#fff;border:none;">⬅ 返回</button>
+    <div class="receipt-container" style="max-width:420px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:20px;">
+      <div class="receipt-box" style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.1);width:100%;">
+        <h2 style="text-align:center;margin-bottom:15px;">Purchase Receipt</h2>
+        <p><b>客户：</b>${cust}</p>
+        <p><b>编号：</b>${no}</p>
+        <p><b>时间：</b>${timeStr}</p>
+        <table style="width:100%;border-collapse:collapse;margin-top:10px;">
+          <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
+          <tbody>${itemsHTML}</tbody>
+          <tfoot><tr><td colspan="3" style="font-weight:700;">总计</td><td><b>RM ${tot.toFixed(2)}</b></td></tr></tfoot>
+        </table>
+        <div style="text-align:center;margin-top:20px;font-weight:700;">❀ Thank You ❀</div>
+      </div>
+      <div class="action-buttons no-print" style="display:flex;justify-content:center;gap:12px;width:100%;">
+        <button onclick="setPaper('a4')" style="flex:1;padding:12px;border-radius:8px;background:#3498db;color:#fff;border:none;font-size:15px;">🖨 打印 A4</button>
+        <button onclick="setPaper('receipt')" style="flex:1;padding:12px;border-radius:8px;background:#3498db;color:#fff;border:none;font-size:15px;">🧾 打印小票</button>
+        <button onclick="window.location.reload()" style="flex:1;padding:12px;border-radius:8px;background:#e67e22;color:#fff;border:none;font-size:15px;">⬅ 返回</button>
       </div>
     </div>`;
 }
 
 function setPaper(type){
-      if(type==='a4'){
-        const style=`@page { size: A4 portrait; margin: 15mm; }
-          body, html {
-            margin:0; padding:0; height:auto !important; background:#fff !important;
-            color:#000 !important; font-weight:600;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          .receipt-container { width:100% !important; margin:0 auto !important; padding:0 !important; }
-          table {width:100%;border-collapse:collapse;margin-top:10px;}
-          th,td {border:1px solid #000;padding:6px;text-align:center;color:#000 !important;}
-          tfoot td {font-weight:bold;border-top:2px solid #000;color:#000 !important;}`; 
-        applyPrintStyle(style);
-      } else {
-        const style=`@page { size: 58mm auto; margin:0; }
-          body {
-            margin:0; color:#000 !important; font-weight:600;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          .receipt-container {
-            width:58mm!important; max-width:58mm!important;
-            font-family:monospace; font-size:11pt;
-            box-shadow:none!important; border:none!important; padding:4px!important;
-          }
-          table {
-            width:100% !important;
-            table-layout: fixed !important;   /* 🔑 固定列宽 */
-            border-collapse: collapse !important;
-            word-wrap: break-word;            /* 🔑 自动换行 */
-            font-size:10pt;
-          }
-          th,td {
-            padding:2px 2px;
-            text-align:left;
-            color:#000 !important;
-            border:1px solid #000 !important; /* 🔑 确保边框完整 */
-          }
-          thead th:nth-child(1),
-          tbody td:nth-child(1) { width:35%; }  /* 产品 */
-          thead th:nth-child(2),
-          tbody td:nth-child(2) { width:20%; }  /* 重量 */
-          thead th:nth-child(3),
-          tbody td:nth-child(3) { width:20%; }  /* 单价 */
-          thead th:nth-child(4),
-          tbody td:nth-child(4) { width:25%; }  /* 总价 */
-          tfoot td {
-            border-top:1px dashed #000;
-            font-weight:bold;
-            color:#000 !important;
-          }`; 
-        applyPrintStyle(style);
-      }
-      window.print();
-    }
-
-
-
-    function applyPrintStyle(css){
-      let s=document.getElementById('printStyle');
-      if(!s){
-        s=document.createElement('style');
-        s.id='printStyle';
-        document.head.appendChild(s);
-      }
-      s.innerHTML = `
-        ${css}
-        @media print {
-          * { color:#000 !important; background:#fff !important; box-shadow:none !important; }
-          body, html { margin:0 !important; padding:0 !important; font-weight:600 !important;
-            -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          .no-print { display:none !important; }
-        }
-      `;
-    }
+  if(type==='a4'){
+    const style=`@page { size: A4 portrait; margin: 15mm; }
+      body, html {margin:0;padding:0;background:#fff!important;color:#000!important;font-weight:700!important;}
+      .receipt-container {width:100%!important;max-width:100%!important;}
+      table {width:100%;border-collapse:collapse;margin-top:10px;}
+      th,td {border:1px solid #000;padding:6px;text-align:center;font-size:12pt!important;color:#000!important;font-weight:700!important;}
+      tfoot td {font-weight:700;border-top:2px solid #000;}`; 
+    applyPrintStyle(style);
+  } else {
+    const style=`@page { size: 58mm auto; margin:0; }
+      body, html {margin:0;padding:0;background:#fff!important;color:#000!important;font-weight:700!important;}
+      .receipt-container {width:58mm!important;max-width:58mm!important;margin:0 auto!important;}
+      table {width:100%!important;border-collapse:collapse;margin-top:10px;}
+      th,td {border:1px solid #000;padding:4px;text-align:center;font-size:10pt!important;color:#000!important;font-weight:700!important;}
+      tfoot td {font-weight:700;border-top:2px solid #000;}`; 
+    applyPrintStyle(style);
+  }
+  window.print();
+}
 
 function applyPrintStyle(css){
   let s=document.getElementById('printStyle');
-  if(!s){s=document.createElement('style');s.id='printStyle';document.head.appendChild(s);}
+  if(!s){
+    s=document.createElement('style');
+    s.id='printStyle';
+    document.head.appendChild(s);
+  }
   s.innerHTML=css+`@media print{.no-print{display:none!important;}}`;
 }
 
@@ -326,3 +273,4 @@ window.addEventListener('DOMContentLoaded',()=>{
 <script src="auth.js"></script>
 </body>
 </html>
+
