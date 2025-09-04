@@ -32,46 +32,14 @@
     .spinner{border:4px solid #f3f3f3;border-top:4px solid var(--primary);border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;}
     @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
     /* 弹窗 */
-    #popupInput{
-      position:absolute;background:#fff;border:1px solid #ddd;border-radius:var(--radius);
-      padding:16px;box-shadow:0 4px 10px rgba(0,0,0,0.15);display:none;z-index:999;min-width:220px;
-    }
+    #popupInput{position:absolute;background:#fff;border:1px solid #ddd;border-radius:var(--radius);padding:16px;box-shadow:0 4px 10px rgba(0,0,0,0.15);display:none;z-index:999;min-width:220px;}
     #popupInput b{display:block;margin-bottom:14px;font-weight:600;}
-    #popupInput input{
-      display:block;width:100%;margin:12px 0;padding:10px;
-      border:1px solid #ccc;border-radius:var(--radius);font-size:15px;box-sizing:border-box;
-    }
-    #popupInput button {
-      background: var(--primary);border: none;padding: 12px;color: white;
-      font-size: 15px;border-radius: var(--radius);cursor: pointer;margin-top: 12px;width: 100%;
-    }
+    #popupInput input{display:block;width:100%;margin:12px 0;padding:10px;border:1px solid #ccc;border-radius:var(--radius);font-size:15px;box-sizing:border-box;}
+    #popupInput button {background: var(--primary);border: none;padding: 12px;color: white;font-size: 15px;border-radius: var(--radius);cursor: pointer;margin-top: 12px;width: 100%;}
     #popupInput button:hover {background: var(--primary-dark);}
-    /* Submit 按钮统一风格 */
-    #submitButton {
-      background: linear-gradient(135deg,var(--success),#219150);
-      border: none;padding: 10px 16px;color: white;font-size: 15px;
-      border-radius: var(--radius);cursor: pointer;
-    }
+    #submitButton {background: linear-gradient(135deg,var(--success),#219150);border: none;padding: 10px 16px;color: white;font-size: 15px;border-radius: var(--radius);cursor: pointer;}
     #submitButton:hover {background:#1e7c43;}
-    /* 打印优化 */
-    @media print {
-    header, #submitButton, .no-print, #toast, #loadingOverlay {display:none!important;}
-    header,.header-actions,button {display:none !important;}
-    body,html {
-      height:auto !important;min-height:auto !important;margin:0 !important;padding:0 !important;
-      display:block !important;background:white !important;
-      font-size:18px !important;   /* ✅ 全局字体放大 */
-      line-height:1.6 !important;
-    }
-    main,.section {
-      display:block !important;height:auto !important;min-height:auto !important;
-      padding:0 !important;box-shadow:none !important;border:none !important;
-    }
-    table th, table td {
-      font-size:25px !important;   /* ✅ 表格文字放大 */
-      padding:15px !important;
-    }
-  }
+    @media print {.no-print, header, #submitButton, #toast, #loadingOverlay {display:none!important;}}
   </style>
 </head>
 <body>
@@ -172,12 +140,10 @@ function confirmPopup(){
   const p=parseFloat(document.getElementById('popupPrice').value);
   if(currentProduct&&!isNaN(w)&&!isNaN(p)){
     items.push({product:currentProduct,weight:w,price:p});
-    updateInvoice();
-    showToast("✅ 添加成功");
+    updateInvoice();showToast("✅ 添加成功");
     document.getElementById('customProductInput').value="";
   }else{alert("请填写重量和单价！");return;}
-  document.getElementById('popupWeight').value="";
-  document.getElementById('popupPrice').value="";
+  document.getElementById('popupWeight').value="";document.getElementById('popupPrice').value="";
   document.getElementById('popupInput').style.display="none";
 }
 function updateInvoice(){
@@ -202,39 +168,123 @@ function showToast(msg){const t=document.getElementById("toast");t.innerText=msg
 function showLoading(msg="..."){document.getElementById("loadingText").innerText=msg;document.getElementById("loadingOverlay").style.display="flex";}
 function hideLoading(){document.getElementById("loadingOverlay").style.display="none";}
 
-// ✅ 点击空白处关闭 popup
 document.addEventListener('click',(e)=>{
-  const popup=document.getElementById('popupInput');
-  const custom=document.getElementById('customProductInput');
+  const popup=document.getElementById('popupInput');const custom=document.getElementById('customProductInput');
   if(popup.style.display==="block" && !popup.contains(e.target) && !e.target.classList.contains('product-button') && e.target!==custom){
-    popup.style.display="none";
-    document.getElementById('popupWeight').value="";
-    document.getElementById('popupPrice').value="";
+    popup.style.display="none";document.getElementById('popupWeight').value="";document.getElementById('popupPrice').value="";
   }
 });
 
-// ✅ 收据预览
+// ✅ 收据预览 + A4/小票打印
 function showReceiptPage(cust, items){
-  const now=new Date();const timeStr=now.toLocaleString('zh-MY');const no=window.receiptNo;
+  const now=new Date();
+  const timeStr=now.toLocaleString('zh-MY');
+  const no=window.receiptNo;
   let itemsHTML='',tot=0;
-  items.forEach(it=>{const s=it.weight*it.price;tot+=s;itemsHTML+=`<tr><td>${it.product}</td><td>${it.weight.toFixed(2)}</td><td>RM ${it.price.toFixed(2)}</td><td>RM ${s.toFixed(2)}</td></tr>`;});
+
+  items.forEach(it=>{
+    const s=it.weight*it.price;
+    tot+=s;
+    itemsHTML+=`<tr>
+      <td>${it.product}</td>
+      <td>${it.weight.toFixed(2)}</td>
+      <td>RM ${it.price.toFixed(2)}</td>
+      <td>RM ${s.toFixed(2)}</td>
+    </tr>`;
+  });
+
+  // ✅ 把收据和按钮都包在一个 receipt-container 里
   document.getElementById("mainContent").innerHTML=`
-    <div class="section">
-      <div class="header">Purchase Receipt</div>
-      <p><b>客户：</b>${cust}</p>
-      <p><b>编号：</b>${no}</p>
-      <p><b>时间：</b>${timeStr}</p>
-      <table>
-        <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
-        <tbody>${itemsHTML}</tbody>
-        <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
-      </table>
-      <div style="text-align:center;margin-top:20px;">❀ Thank You ❀</div>
-      <div style="text-align:center;margin-top:20px;" class="no-print">
-        <button onclick="window.print()">🖨 打印</button>
-        <button onclick="window.location.reload()">⬅ 返回</button>
+    <div class="receipt-container" style="max-width:420px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:20px;">
+      
+      <div class="receipt-box" style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.1);width:100%;">
+        <h2 style="text-align:center;margin-bottom:15px;">Purchase Receipt</h2>
+        <p><b>客户：</b>${cust}</p>
+        <p><b>编号：</b>${no}</p>
+        <p><b>时间：</b>${timeStr}</p>
+        <table style="width:100%;border-collapse:collapse;margin-top:10px;">
+          <thead>
+            <tr style="background:#fdf2c5;">
+              <th>产品</th><th>重量</th><th>单价</th><th>总价</th>
+            </tr>
+          </thead>
+          <tbody>${itemsHTML}</tbody>
+          <tfoot>
+            <tr><td colspan="3" style="font-weight:bold;">总计</td><td>RM ${tot.toFixed(2)}</td></tr>
+          </tfoot>
+        </table>
+        <div style="text-align:center;margin-top:20px;">❀ Thank You ❀</div>
+      </div>
+
+      <div class="action-buttons no-print" style="display:flex;justify-content:center;gap:12px;width:100%;">
+        <button onclick="setPaper('a4')" 
+          style="flex:1;padding:12px;border-radius:8px;background:#3498db;color:#fff;border:none;font-size:15px;">
+          🖨 打印 A4
+        </button>
+        <button onclick="setPaper('receipt')" 
+          style="flex:1;padding:12px;border-radius:8px;background:#3498db;color:#fff;border:none;font-size:15px;">
+          🧾 打印小票
+        </button>
+        <button onclick="window.location.reload()" 
+          style="flex:1;padding:12px;border-radius:8px;background:#e67e22;color:#fff;border:none;font-size:15px;">
+          ⬅ 返回
+        </button>
       </div>
     </div>`;
+}
+
+
+
+function setPaper(type){
+  if(type==='a4'){
+    const style=`@page { size: A4 portrait; margin: 15mm; }
+      body { font-family: Arial, sans-serif; font-size: 12pt; margin: 0; padding: 0; }
+      .receipt-container, .receipt-box {
+        all: unset !important;   /* 清掉所有 inline 样式 */
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+      th,td { border: 1px solid #000; padding: 6px; text-align: center; }
+      tfoot td { font-weight: bold; border-top: 2px solid #000; }`;
+    applyPrintStyle(style);
+  } else {
+    const style=`@page { size: 58mm auto; margin: 0; }
+      body { margin: 0; }
+      .receipt-box {
+        width: 58mm !important;
+        max-width: 58mm !important;
+        font-family: monospace;
+        font-size: 10pt;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 4px !important;
+      }
+      table { width: 100%; font-size: 9pt; border-collapse: collapse; }
+      th,td { text-align: left; padding: 2px 0; }
+      tfoot td { border-top: 1px dashed #000; font-weight: bold; }`;
+    applyPrintStyle(style);
+  }
+  window.print();
+}
+
+
+
+function applyPrintStyle(css){
+  let s=document.getElementById('printStyle');
+  if(!s){
+    s=document.createElement('style');
+    s.id='printStyle';
+    document.head.appendChild(s);
+  }
+  s.innerHTML=css+`@media print{.no-print{display:none!important;}}`;
+}
+
+function wrapTicket(){
+  if(!document.querySelector('.ticket')){
+    document.body.innerHTML='<div class="ticket">'+document.body.innerHTML+'</div>';
+  }
 }
 
 let isSubmitting=false;
@@ -249,8 +299,7 @@ async function submitToAirtable(){
       const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
       if(!res.ok){alert("❌ 提交失败");hideLoading();return;}
     }
-    hideLoading();
-    showReceiptPage(cust,items);
+    hideLoading();showReceiptPage(cust,items);
   }catch(e){alert("异常:"+e.message);hideLoading();}
   finally{isSubmitting=false;document.getElementById('submitButton').disabled=false;}
 }
