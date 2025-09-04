@@ -14,7 +14,6 @@
       --text-main:#2c3e50;
       --radius:14px;
     }
-
     body {
       font-family:"Segoe UI","Inter",sans-serif;
       margin:0;
@@ -24,7 +23,6 @@
       flex-direction:column;
       height:100vh;
     }
-
     header {
       background:var(--card-bg);
       box-shadow:0 2px 8px rgba(0,0,0,.08);
@@ -43,10 +41,8 @@
       cursor:pointer;
     }
     header button:hover{background:var(--primary-dark);}
-
     main {flex:1;display:flex;flex-direction:column;padding:20px;gap:20px;}
     @media(min-width:900px){main{flex-direction:row;}}
-
     .section {
       flex:1;
       background:var(--card-bg);
@@ -62,7 +58,6 @@
       border-radius: var(--radius);
       margin-bottom: 15px;
     }
-
     .button-group {display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;}
     .product-button {
       padding:10px 16px;
@@ -84,7 +79,6 @@
       font-size:14px;
     }
     .btn.long{display:block;width:100%;margin-top:10px;}
-
     #customProductInput {
       margin-top: 10px;
       padding: 12px 18px;
@@ -96,11 +90,9 @@
       box-sizing: border-box;
       text-align: center;
     }
-
     table {width:100%;border-collapse:collapse;margin-top:15px;}
     th,td {border:1px solid #ddd;padding:8px;text-align:center;}
     th{background:#f5f5f5;}
-
     #popupInput {
       position:absolute;
       background:#fff;
@@ -123,7 +115,6 @@
       border-radius:var(--radius);
       box-sizing:border-box;
     }
-
     @media print {
       header, #submitButton, .no-print, #toast, #loadingOverlay {display:none!important;}
       body,html,main,.section {
@@ -161,7 +152,6 @@
         <button class="product-button" data-name="Musang CCM">CCM</button>
         <button class="product-button" data-name="Musang CCCM">CCCM</button>
       </div>
-
       <h4>🌑 Black Thorn</h4>
       <div class="button-group">
         <button class="product-button" data-name="BTA">BTA</button>
@@ -169,14 +159,12 @@
         <button class="product-button" data-name="BTC">BTC</button>
         <button class="product-button" data-name="BTCC">BTCC</button>
       </div>
-
       <h4>🌕 D24</h4>
       <div class="button-group">
         <button class="product-button" data-name="D24A">D24A</button>
         <button class="product-button" data-name="D24B">D24B</button>
         <button class="product-button" data-name="D24C">D24C</button>
       </div>
-
       <h4>🍃 其他品种</h4>
       <div class="button-group">
         <button class="product-button" data-name="Kampung">Kampung</button>
@@ -222,9 +210,7 @@
 
   <script>
     const API_URL="https://syve-dinvoice-system.vercel.app/api/salestoken";
-    const items=[];
-    let currentProduct=null;
-    let isCustom=false;
+    const items=[]; let currentProduct=null; let isCustom=false;
     window.receiptNo=generateReceiptNo();
 
     function generateReceiptNo(){
@@ -235,8 +221,7 @@
     }
 
     function selectProduct(name,btn){
-      currentProduct=name;
-      isCustom=false;
+      currentProduct=name; isCustom=false;
       document.getElementById('popupProductName').innerText="🧺 "+name;
       const rect=btn.getBoundingClientRect();
       const popup=document.getElementById('popupInput');
@@ -251,12 +236,8 @@
       const p=parseFloat(document.getElementById('popupPrice').value);
       if(currentProduct&&!isNaN(w)&&!isNaN(p)){
         items.push({product:currentProduct,weight:w,price:p});
-        updateInvoice();
-        showToast("✅ 添加成功");
-      } else {
-        alert("请填写重量和单价！");
-        return;
-      }
+        updateInvoice(); showToast("✅ 添加成功");
+      } else {alert("请填写重量和单价！"); return;}
       document.getElementById('popupWeight').value="";
       document.getElementById('popupPrice').value="";
       document.getElementById('popupInput').style.display="none";
@@ -264,18 +245,14 @@
     }
 
     function updateInvoice(){
-      const tbody=document.getElementById('invoiceItems');
-      tbody.innerHTML='';
-      let total=0;
-      items.forEach((it,i)=>{
-        const sub=it.weight*it.price; total+=sub;
+      const tbody=document.getElementById('invoiceItems');tbody.innerHTML=''; let total=0;
+      items.forEach((it,i)=>{const sub=it.weight*it.price; total+=sub;
         tbody.insertAdjacentHTML('beforeend',
           `<tr><td>${it.product}</td>
           <td><input type="number" value="${it.weight}" onchange="editItem(${i},'weight',this.value)"></td>
           <td><input type="number" value="${it.price.toFixed(2)}" onchange="editItem(${i},'price',this.value)"></td>
           <td>${sub.toFixed(2)}</td>
-          <td><button onclick="deleteItem(${i})">❌ 删除</button></td></tr>`);
-      });
+          <td><button onclick="deleteItem(${i})">❌ 删除</button></td></tr>`);});
       document.getElementById('totalAmount').innerText=total.toFixed(2);
       document.getElementById('submitButton').style.display=items.length?'inline-block':'none';
     }
@@ -283,39 +260,61 @@
     function editItem(i,f,v){const n=parseFloat(v);if(!isNaN(n)){items[i][f]=n;updateInvoice();}}
     function deleteItem(i){if(confirm('确定删除?')){items.splice(i,1);updateInvoice();}}
     function logout(){alert("已退出登录");}
-
-    function showToast(msg){
-      const t=document.getElementById("toast");
-      t.innerText=msg;t.style.visibility="visible";
-      setTimeout(()=>t.style.visibility="hidden",2000);
-    }
-    function showLoading(msg="..."){
-      document.getElementById("loadingText").innerText=msg;
-      document.getElementById("loadingOverlay").style.display="flex";
-    }
+    function showToast(msg){const t=document.getElementById("toast");t.innerText=msg;t.style.visibility="visible";setTimeout(()=>t.style.visibility="hidden",2000);}
+    function showLoading(msg="..."){document.getElementById("loadingText").innerText=msg;document.getElementById("loadingOverlay").style.display="flex";}
     function hideLoading(){document.getElementById("loadingOverlay").style.display="none";}
 
+    // ✅ 收据预览 + 打印
     function showReceiptPage(cust, items){
-      const now=new Date();const timeStr=now.toLocaleString('zh-MY');const no=window.receiptNo;
+      const now=new Date(); const timeStr=now.toLocaleString('zh-MY'); const no=window.receiptNo;
       let itemsHTML='',tot=0;
-      items.forEach(it=>{const s=it.weight*it.price;tot+=s;itemsHTML+=`<tr><td>${it.product}</td><td>${it.weight.toFixed(2)}</td><td>RM ${it.price.toFixed(2)}</td><td>RM ${s.toFixed(2)}</td></tr>`;});
+      items.forEach(it=>{const s=it.weight*it.price;tot+=s;
+        itemsHTML+=`<tr><td>${it.product}</td><td>${it.weight.toFixed(2)}</td><td>RM ${it.price.toFixed(2)}</td><td>RM ${s.toFixed(2)}</td></tr>`;});
       document.getElementById("mainContent").innerHTML=`
-        <div class="section">
-          <div class="header">Sales Receipt</div>
+        <div class="section receipt-container" style="max-width:600px;margin:0 auto;">
+          <h2 style="text-align:center;">Sales Receipt</h2>
           <p><b>客户：</b>${cust}</p>
           <p><b>编号：</b>${no}</p>
           <p><b>时间：</b>${timeStr}</p>
           <table>
             <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
             <tbody>${itemsHTML}</tbody>
-            <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
+            <tfoot><tr><td colspan="3"><b>总计</b></td><td><b>RM ${tot.toFixed(2)}</b></td></tr></tfoot>
           </table>
           <div style="text-align:center;margin-top:20px;">❀ Thank You ❀</div>
-          <div style="text-align:center;margin-top:20px;" class="no-print">
-            <button class="btn" onclick="window.print()">🖨 打印</button>
+          <div class="no-print" style="display:flex;gap:12px;margin-top:20px;justify-content:center;">
+            <button class="btn" onclick="setPaper('a4')">🖨 打印 A4</button>
+            <button class="btn" onclick="setPaper('receipt')">🧾 打印小票</button>
             <button class="btn" onclick="window.location.reload()">⬅ 返回</button>
           </div>
         </div>`;
+    }
+
+    // ✅ 打印样式
+    function setPaper(type){
+      if(type==='a4'){
+        const style=`@page { size: A4 portrait; margin: 15mm; }
+          body { font-family: Arial, sans-serif; font-size: 12pt; }
+          .receipt-container {width:100%!important;max-width:100%!important;box-shadow:none!important;border:none!important;padding:0!important;}
+          table {width:100%;border-collapse:collapse;margin-top:10px;}
+          th,td {border:1px solid #000;padding:6px;text-align:center;}
+          tfoot td {font-weight:bold;border-top:2px solid #000;}`;
+        applyPrintStyle(style);
+      } else {
+        const style=`@page { size: 58mm auto; margin:0; }
+          body { margin:0; }
+          .receipt-container {width:58mm!important;max-width:58mm!important;font-family:monospace;font-size:10pt;box-shadow:none!important;border:none!important;padding:4px!important;}
+          table {width:100%;font-size:9pt;border-collapse:collapse;}
+          th,td {padding:2px 0;text-align:left;}
+          tfoot td {border-top:1px dashed #000;font-weight:bold;}`;
+        applyPrintStyle(style);
+      }
+      window.print();
+    }
+    function applyPrintStyle(css){
+      let s=document.getElementById('printStyle');
+      if(!s){s=document.createElement('style');s.id='printStyle';document.head.appendChild(s);}
+      s.innerHTML=css+`@media print{.no-print{display:none!important;}}`;
     }
 
     let isSubmitting=false;
@@ -323,11 +322,7 @@
       if(isSubmitting)return;isSubmitting=true;
       document.getElementById('submitButton').disabled=true;
       const cust=document.getElementById('customerName').value.trim();
-      if(!cust||!items.length){
-        alert('请填写客户名字并至少添加一项');
-        isSubmitting=false;document.getElementById('submitButton').disabled=false;
-        return;
-      }
+      if(!cust||!items.length){alert('请填写客户名字并至少添加一项');isSubmitting=false;document.getElementById('submitButton').disabled=false;return;}
       showLoading("正在提交...");
       try{
         for(const it of items){
@@ -335,8 +330,7 @@
           const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
           if(!res.ok){alert("❌ 提交失败");hideLoading();return;}
         }
-        hideLoading();
-        showReceiptPage(cust,items);
+        hideLoading(); showReceiptPage(cust,items);
       }catch(e){alert("异常:"+e.message);hideLoading();}
       finally{isSubmitting=false;document.getElementById('submitButton').disabled=false;}
     }
@@ -344,11 +338,8 @@
     // 自定义输入框监听
     const custom=document.getElementById('customProductInput');
     custom.addEventListener('input',()=>{
-      const v=custom.value.trim();
-      const popup=document.getElementById('popupInput');
-      if(v){
-        currentProduct=v;
-        isCustom=true;
+      const v=custom.value.trim(); const popup=document.getElementById('popupInput');
+      if(v){currentProduct=v;isCustom=true;
         document.getElementById('popupProductName').innerText="🧺 "+v;
         const rect=custom.getBoundingClientRect();
         popup.style.top=(window.scrollY+rect.bottom+8)+"px";
@@ -357,13 +348,9 @@
       }else{popup.style.display="none";}
     });
 
-    // 点击空白处关闭 popup
     document.addEventListener('click',(e)=>{
       const popup=document.getElementById('popupInput');
-      if(popup.style.display==="block"
-         &&!popup.contains(e.target)
-         &&!e.target.classList.contains('product-button')
-         &&e.target.id!=="customProductInput"){
+      if(popup.style.display==="block"&&!popup.contains(e.target)&&!e.target.classList.contains('product-button')&&e.target.id!=="customProductInput"){
         popup.style.display="none";
         document.getElementById('popupWeight').value="";
         document.getElementById('popupPrice').value="";
