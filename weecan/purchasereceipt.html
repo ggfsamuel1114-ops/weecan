@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -17,7 +15,7 @@
       --text-main: #2c3e50;
       --radius: 12px;
     }
-    
+
     body {
       font-family: "Segoe UI", "Inter", sans-serif;
       background: var(--bg);
@@ -25,7 +23,7 @@
       color: var(--text-main);
       padding: 0;
     }
-    
+
     header {
       background: var(--card-bg);
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -55,13 +53,13 @@
     header button:hover {
       background: var(--primary-dark);
     }
-    
+
     main {
       max-width: 1100px;
       margin: 30px auto;
       padding: 0 20px;
     }
-    
+
     #searchBar {
       padding: 10px 14px;
       font-size: 15px;
@@ -71,7 +69,7 @@
       border-radius: var(--radius);
       border: 1px solid #ccd;
     }
-    
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -89,7 +87,7 @@
       background: #fdf2c5; /* 浅黄表头 */
       font-weight: 600;
     }
-    
+
     .pagination {
       margin-top: 15px;
       display: flex;
@@ -108,7 +106,7 @@
     .pagination button:hover {
       background: var(--primary-dark);
     }
-    
+
     /* 操作按钮 */
     table button {
       padding: 6px 12px;
@@ -122,7 +120,7 @@
     .btn-view   { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
     .btn-print  { background: linear-gradient(135deg, var(--success), #219150); color: white; }
     .btn-cancel { background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; }
-    
+
     /* 模态框 */
     .modal {
       display: none;
@@ -156,7 +154,7 @@
       from { opacity: 0; transform: translateY(-10px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    
+
     /* Loading 遮罩 */
     #loadingOverlay {
       position: fixed;
@@ -201,7 +199,6 @@
   <script>
     const token = localStorage.getItem("token");
     if (!token) {
-      // 没有登录，直接跳转到 login.html
       window.location.href = "index.html";
     }
   </script>
@@ -246,7 +243,6 @@
     </div>
   </div>
 
-  <!-- auth.js 登录校验 -->
   <script src="auth.js"></script>
 
   <script>
@@ -256,6 +252,7 @@
 
     function showLoading() { document.getElementById("loadingOverlay").style.display = "flex"; }
     function hideLoading() { document.getElementById("loadingOverlay").style.display = "none"; }
+    function sendBack() { window.location.href = 'main.html'; }
 
     async function fetchAllReceipts() {
       showLoading();
@@ -266,8 +263,6 @@
         return records;
       } finally { hideLoading(); }
     }
-
-    function sendBack() { window.location.href = 'main.html'; }
 
     function renderTable(page = 1) {
       const tbody = document.querySelector("#historyTable tbody");
@@ -395,91 +390,63 @@
     function prevPage() { if (currentPage > 1) { currentPage--; renderTable(currentPage); } }
     function nextPage() { if (currentPage < Math.ceil(filteredRows.length / rowsPerPage)) { currentPage++; renderTable(currentPage); } }
 
-    // 🟡 改良版打印函数（预览 + 返回按钮）
+    // 🟡 打印函数：支持 A4 / 小票，按钮横向排版
     function printOne(receiptNo) {
       const rows = allRecords.filter(r => r.fields["Receipt Number"] === receiptNo);
       if (!rows.length) return alert("Invoice not found");
-    
+
       const cust = rows[0].fields["Customer Name"] || "N/A";
       const timeStr = new Date(rows[0].fields["Time Stamp"]).toLocaleString("zh-MY");
-    
-      let tot = 0;
-      let itemsHTML = "";
-    
+
+      let tot = 0, itemsHTML = "";
       rows.forEach(r => {
         const product = r.fields["Product Name"] || "";
         const weight = parseFloat(r.fields["Weight"]) || 0;
         const price = parseFloat(r.fields["Unit Price"]) || 0;
         const subtotal = weight * price;
         tot += subtotal;
-    
-        itemsHTML += `
-          <tr>
-            <td>${product}</td>
-            <td>${weight.toFixed(2)} kg</td>
-            <td>RM ${price.toFixed(2)}</td>
-            <td>RM ${subtotal.toFixed(2)}</td>
-          </tr>`;
+        itemsHTML += `<tr>
+          <td>${product}</td>
+          <td>${weight.toFixed(2)} kg</td>
+          <td>RM ${price.toFixed(2)}</td>
+          <td>RM ${subtotal.toFixed(2)}</td>
+        </tr>`;
       });
-    
+
       const win = window.open("", "_blank");
       win.document.write(`
         <html>
           <head>
             <meta charset="UTF-8"/>
             <title>Invoice ${receiptNo}</title>
-            <style>
-              body {
-                font-family: Arial, sans-serif;
-                font-size: 12pt;
-                padding: 20px;
-                color: #2c3e50;
-              }
-              .header {
-                text-align: center;
-                font-size: 18pt;
-                font-weight: bold;
-                margin-bottom: 15px;
-              }
-              p {
-                margin: 4px 0;
-              }
-              table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-              }
-              th, td {
-                border: 1px solid #000;
-                padding: 6px;
-                text-align: center;
-              }
-              th {
-                background: #f5f5f5;
-                font-weight: 600;
-              }
-              tfoot td {
-                font-weight: bold;
-                background: #f9f9f9;
-              }
-              .footer {
-                text-align: center;
+            <style id="printStyle">
+              body { font-family: Arial, sans-serif; font-size: 12pt; padding: 20px; color: #2c3e50; }
+              .header { text-align: center; font-size: 18pt; font-weight: bold; margin-bottom: 15px; }
+              table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+              th, td { border: 1px solid #000; padding: 6px; text-align: center; }
+              tfoot td { font-weight: bold; background: #f9f9f9; }
+              .footer { text-align: center; margin-top: 20px; }
+              .no-print {
                 margin-top: 20px;
+                display: flex;
+                justify-content: center;
+                gap: 15px;
               }
-              .btn {
-                margin: 10px;
-                padding: 8px 16px;
+              .no-print .btn {
+                flex: 0 0 120px;
+                padding: 10px 0;
+                font-size: 12pt;
                 border: none;
-                border-radius: 6px;
-                background: #3498db;
+                border-radius: 8px;
+                background: linear-gradient(135deg, #3498db, #2c80b4);
                 color: #fff;
                 cursor: pointer;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.2);
               }
-              .btn:hover { background: #2c80b4; }
-              /* 打印时隐藏按钮 */
-              @media print {
-                .no-print { display: none !important; }
+              .no-print .btn:hover {
+                background: linear-gradient(135deg, #2c80b4, #246a91);
               }
+              @media print { .no-print { display: none !important; } }
             </style>
           </head>
           <body>
@@ -488,36 +455,54 @@
             <p><b>收据编号:</b> ${receiptNo}</p>
             <p><b>时间:</b> ${timeStr}</p>
             <table>
-              <thead>
-                <tr>
-                  <th>产品</th>
-                  <th>重量 (kg)</th>
-                  <th>单价 (RM)</th>
-                  <th>小计 (RM)</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${itemsHTML}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colspan="3">总计</td>
-                  <td>RM ${tot.toFixed(2)}</td>
-                </tr>
-              </tfoot>
+              <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>小计</th></tr></thead>
+              <tbody>${itemsHTML}</tbody>
+              <tfoot><tr><td colspan="3">总计</td><td>RM ${tot.toFixed(2)}</td></tr></tfoot>
             </table>
             <div class="footer">❀ Thank You ❀</div>
-            <div class="no-print" style="text-align:center; margin-top:20px;">
-              <button class="btn" onclick="window.print()">🖨 打印 / 存 PDF</button>
+            <div class="no-print">
+              <button class="btn" onclick="setPaper('a4')">🖨 打印 A4</button>
+              <button class="btn" onclick="setPaper('receipt')">🧾 打印小票</button>
               <button class="btn" onclick="window.close()">⬅ 返回</button>
             </div>
+            <script>
+              function setPaper(type) {
+                var style = document.getElementById("printStyle");
+                if (type === "a4") {
+                  style.innerHTML = \`
+                    @page { size: A4 portrait; margin: 15mm; }
+                    body { font-family: Arial; font-size: 12pt; padding: 20px; }
+                    table { width:100%; border-collapse:collapse; margin-top:10px; }
+                    th,td { border:1px solid #000; padding:6px; text-align:center; }
+                    tfoot td { font-weight:bold; background:#f9f9f9; }
+                    .footer { text-align:center; margin-top:20px; font-size:11pt; }
+                    @media print { .no-print { display:none !important; } }
+                  \`;
+                } else {
+                  style.innerHTML = \`
+                    @page { size: 48mm auto; margin: 0; }
+                    body { display:flex; justify-content:center; margin:0; padding:0; }
+                    .ticket { width:48mm; font-family: monospace,Arial; font-size:10pt; padding:2mm; box-sizing:border-box; }
+                    table { width:100%; font-size:9pt; border-collapse:collapse; }
+                    th,td { border:none; text-align:left; padding:2px 0; }
+                    tfoot td { border-top:1px dashed #000; font-weight:bold; }
+                    .footer { text-align:center; margin-top:10px; font-size:10pt; }
+                    @media print { .no-print { display:none !important; } }
+                  \`;
+                  if (!document.querySelector(".ticket")) {
+                    document.body.innerHTML = '<div class="ticket">' + document.body.innerHTML + '</div>';
+                  }
+                }
+                window.print();
+              }
+            <\/script>
           </body>
         </html>
       `);
       win.document.close();
     }
 
-    // 初始化数据
+    // 初始化
     fetchAllReceipts().then(records => {
       allRecords = records;
       const seen = new Set();
