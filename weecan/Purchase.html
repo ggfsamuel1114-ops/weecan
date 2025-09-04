@@ -228,96 +228,91 @@ function showReceiptPage(cust, items){
     itemsHTML+=`<tr>
       <td>${it.product}</td>
       <td>${it.weight.toFixed(2)}</td>
-      <td>RM ${it.price.toFixed(2)}</td>
-      <td>RM ${s.toFixed(2)}</td>
+      <td>${it.price.toFixed(2)}</td>
+      <td>${s.toFixed(2)}</td>
     </tr>`;
   });
 
   document.getElementById("mainContent").innerHTML=`
-    <div class="receipt-container" style="background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.1);min-width:420px;">
-      <h2 style="text-align:center;margin-bottom:15px;">Purchase Receipt</h2>
+    <div class="section receipt-container" style="max-width:600px;margin:0 auto;">
+      <h2 style="text-align:center;">Purchase Receipt</h2>
       <p><b>客户：</b>${cust}</p>
       <p><b>编号：</b>${no}</p>
       <p><b>时间：</b>${timeStr}</p>
-      <table style="width:100%;border-collapse:collapse;margin-top:10px;">
+      <table>
         <thead><tr><th>产品</th><th>重量</th><th>单价</th><th>总价</th></tr></thead>
         <tbody>${itemsHTML}</tbody>
         <tfoot><tr><td colspan="3"><b>总计</b></td><td><b>RM ${tot.toFixed(2)}</b></td></tr></tfoot>
       </table>
-      <div style="text-align:center;margin-top:20px;font-weight:700;">❀ Thank You ❀</div>
+      <div style="text-align:center;margin-top:20px;">❀ Thank You ❀</div>
       <div class="no-print" style="display:flex;gap:12px;margin-top:20px;justify-content:center;">
-        <button onclick="setPaper('a4')" class="btn">🖨 打印 A4</button>
-        <button onclick="setPaper('receipt')" class="btn">🧾 打印小票</button>
-        <button onclick="window.location.reload()" class="btn">⬅ 返回</button>
+        <button class="btn" onclick="setPaper('a4')">🖨 打印 A4</button>
+        <button class="btn" onclick="setPaper('receipt')">🧾 打印小票</button>
+        <button class="btn" onclick="window.location.reload()">⬅ 返回</button>
       </div>
     </div>`;
-
-  // 👇 让收据居中
-  const mc=document.getElementById("mainContent");
-  mc.style.display="flex";
-  mc.style.justifyContent="center";
-  mc.style.alignItems="flex-start";
 }
 
-
-
+// ✅ 打印样式
 function setPaper(type){
   if(type==='a4'){
     const style=`@page { size: A4 portrait; margin: 15mm; }
       body, html {
         margin:0; padding:0; height:auto !important; background:#fff !important;
-        color:#000 !important; font-weight:700 !important;
+        color:#000 !important; font-weight:600;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
       .receipt-container { width:100% !important; margin:0 auto !important; padding:0 !important; }
       table {width:100%;border-collapse:collapse;margin-top:10px;}
-      th,td {border:1px solid #000;padding:6px;text-align:center;color:#000 !important;font-weight:700 !important;}
-      tfoot td {font-weight:700 !important;border-top:2px solid #000;color:#000 !important;}`; 
+      th,td {border:1px solid #000;padding:6px;text-align:center;color:#000 !important;}
+      tfoot td {font-weight:bold;border-top:2px solid #000;color:#000 !important;}`; 
     applyPrintStyle(style);
   } else {
     const style=`@page { size: 58mm auto; margin:0; }
       body {
-        margin:0; color:#000 !important; font-weight:700 !important;
+        margin:0; color:#000 !important; font-weight:600;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
       .receipt-container {
         width:58mm!important; max-width:58mm!important;
-        font-family:monospace; font-size:11pt; font-weight:700 !important;
+        font-family:monospace; font-size:11pt;
         box-shadow:none!important; border:none!important; padding:4px!important;
       }
       table {
         width:100% !important;
-        table-layout: fixed !important;
+        table-layout: fixed !important;   /* 🔑 固定列宽 */
         border-collapse: collapse !important;
-        word-wrap: break-word;
-        font-size:10pt; font-weight:700 !important;
+        word-wrap: break-word;            /* 🔑 自动换行 */
+        font-size:10pt;
       }
       th,td {
         padding:2px 2px;
-        text-align:center;   /* 👈 小票表头 + 内容都居中 */
+        text-align:left;
         color:#000 !important;
-        border:1px solid #000 !important;
-        font-weight:700 !important;
+        border:1px solid #000 !important; /* 🔑 确保边框完整 */
       }
       thead th:nth-child(1),
-      tbody td:nth-child(1) { width:35%; }
+      tbody td:nth-child(1) { width:35%; }  /* 产品 */
       thead th:nth-child(2),
-      tbody td:nth-child(2) { width:20%; }
+      tbody td:nth-child(2) { width:20%; }  /* 重量 */
       thead th:nth-child(3),
-      tbody td:nth-child(3) { width:20%; }
+      tbody td:nth-child(3) { width:20%; }  /* 单价 */
       thead th:nth-child(4),
-      tbody td:nth-child(4) { width:25%; }
+      tbody td:nth-child(4) { width:25%; }  /* 总价 */
       tfoot td {
         border-top:1px dashed #000;
-        font-weight:700 !important;
+        font-weight:bold;
         color:#000 !important;
       }`; 
     applyPrintStyle(style);
   }
   window.print();
 }
+
+
+
 
 function applyPrintStyle(css){
   let s=document.getElementById('printStyle');
@@ -331,11 +326,14 @@ function applyPrintStyle(css){
     @media print {
       * { color:#000 !important; background:#fff !important; box-shadow:none !important; }
       body, html { margin:0 !important; padding:0 !important; font-weight:700 !important;
-        -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important; }
       .no-print { display:none !important; }
     }
   `;
 }
+
+
 
 
 let isSubmitting=false;
