@@ -361,6 +361,7 @@
     function nextPage() { if (currentPage < Math.ceil(filteredRows.length / rowsPerPage)) { currentPage++; renderTable(currentPage); } }
 
     // 打印函数保持不变（可打印 A4 / 小票）
+    // 打印函数：支持 A4 / 小票
     function printOne(receiptNo) {
       const rows = allRecords.filter(r => r.fields["Receipt Number"] === receiptNo);
       if (!rows.length) return alert("Invoice not found");
@@ -421,18 +422,27 @@
                   table { width:100%; border-collapse:collapse; margin-top:10px; }
                   th,td { border:1px solid #000; padding:6px; text-align:center; }
                   tfoot td { font-weight:bold; background:#f9f9f9; }
+                  .footer { text-align:center; margin-top:20px; }
                   @media print { .no-print { display:none !important; } }
                 \`;
                 if (type === "a4") {
                   style.innerHTML = \`@page { size: A4 portrait; margin: 15mm; } \${baseStyle}\`;
                 } else {
                   style.innerHTML = \`
-                    @page { size: 48mm 210mm; margin: 2mm; }
-                    body { width:48mm; font-family: monospace,Arial; font-size:10pt; margin:0; padding:2mm; }
+                    @page { size: 48mm 500mm; margin: 2mm; }
+                    body {
+                      width:48mm;
+                      min-height:180mm; /* 保证小票至少这么长 */
+                      font-family: monospace,Arial;
+                      font-size:10pt;
+                      margin:0;
+                      padding:2mm;
+                    }
                     .header { text-align:center; font-size:12pt; font-weight:bold; margin-bottom:10px; }
                     table { width:100%; font-size:9pt; border-collapse:collapse; }
                     th,td { border:none; text-align:left; padding:2px 0; }
                     tfoot td { border-top:1px dashed #000; font-weight:bold; }
+                    .footer { text-align:center; margin-top:10px; }
                     @media print { .no-print { display:none !important; } }
                   \`;
                 }
@@ -444,6 +454,7 @@
       `);
       win.document.close();
     }
+
 
     fetchAllReceipts().then(records => {
       allRecords = records;
