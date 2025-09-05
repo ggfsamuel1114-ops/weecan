@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-MY">
 <head>
@@ -214,36 +215,39 @@
     function loadReport(url) {
       const overlay = document.getElementById("loadingOverlay");
       overlay.style.display = "flex"; // 显示加载中
-
+  
       const iframe = document.getElementById("reportFrame");
       iframe.style.display = "none";  // 隐藏旧内容，避免闪烁
-
+  
       iframe.onload = function () {
         overlay.style.display = "none"; // 报表加载完关闭 loading
         iframe.style.display = "block"; // 显示报表
       };
-
+  
       iframe.src = url;
       document.getElementById("report-container").style.display = "block";
     }
-
+  
     document.addEventListener("DOMContentLoaded", function() {
-        const token = localStorage.getItem("token"); // auth.js 登录时存的 token
-        if (!token) {
-          document.body.innerHTML = `
-            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
-              <h2 style="color:#e74c3c;">❌ Access Denied</h2>
-              <p>You must login before using the system.</p>
-              <a href="login.html" style="margin-top:20px;padding:10px 20px;background:#3498db;color:white;border-radius:6px;text-decoration:none;">
-                🔑 Go to Login
-              </a>
-            </div>
-          `;
-        } else {
-          // 如果 token 存在，就显示欢迎语
-          document.getElementById("welcome").textContent = "👋 Welcome!";
-        }
-      });
+      const token = localStorage.getItem("token"); // auth.js 登录时存的 token
+      if (!token) {
+        document.body.innerHTML = `
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;">
+            <h2 style="color:#e74c3c;">❌ Access Denied</h2>
+            <p>You must login before using the system.</p>
+            <a href="login.html" style="margin-top:20px;padding:10px 20px;background:#3498db;color:white;border-radius:6px;text-decoration:none;">
+              🔑 Go to Login
+            </a>
+          </div>
+        `;
+      } else {
+        // 如果 token 存在，就显示欢迎语
+        document.getElementById("welcome").textContent = "👋 Welcome!";
+  
+        // ⬇⬇⬇ 就在这里加这一行，就能自动打开买果统计
+        loadReport("https://airtable.com/embed/appC0yAd0xabao41y/shrO1jUBSthFYKs2V?backgroundColor=green&viewControls=on");
+      }
+    });
   </script>
   <script src="auth.js"></script>
 </body>
