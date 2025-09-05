@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-MY">
 <head>
@@ -309,7 +310,7 @@
       const now=new Date(); const timeStr=now.toLocaleString('zh-MY'); const no=window.receiptNo;
       let itemsHTML='',tot=0;
       items.forEach(it=>{const s=it.weight*it.price;tot+=s;
-        itemsHTML+=`<tr><td>${it.product}</td><td>${it.weight.toFixed(2)}</td><td>${it.price.toFixed(2)}</td><td>${s.toFixed(2)}</td></tr>`;});
+        itemsHTML+=`<tr><td>${it.product}</td><td>${it.weight.toFixed(1)}</td><td>${it.price.toFixed(1)}</td><td>${s.toFixed(1)}</td></tr>`;});
       document.getElementById("mainContent").innerHTML=`
         <div class="section receipt-container" style="max-width:600px;margin:0 auto;">
           <h2 style="text-align:center;">Sales Receipt</h2>
